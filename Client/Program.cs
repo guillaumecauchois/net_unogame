@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Client
+namespace cardGames
 {
     internal class Program
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine("|******| UNO - CLIENT - C# .NET Project |*****|");
+            Console.WriteLine("Contributors: Guillaume CAUCHOIS & Pierre STASZAK");
         }
     }
 }
