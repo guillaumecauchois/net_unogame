@@ -4,7 +4,6 @@
     using System.Threading.Tasks;
     using DotNetty.Codecs;
     using DotNetty.Handlers.Logging;
-    using DotNetty.Handlers.Tls;
     using DotNetty.Transport.Bootstrapping;
     using DotNetty.Transport.Channels;
     using DotNetty.Transport.Channels.Sockets;
