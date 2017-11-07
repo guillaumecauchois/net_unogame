@@ -37,7 +37,7 @@
         private CardColor _color;
         private CardValue _value;
 
-        protected Card(CardColor color, CardValue value)
+        public Card(CardColor color, CardValue value)
         {
             this._color = color;
             this._value = value;
