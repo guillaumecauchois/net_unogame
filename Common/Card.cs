@@ -3,11 +3,13 @@
     /* Enumeration definitions */
     public enum CardColor
     {
-        Undefined,
-        Green,
+        Undefined = -1,
+        MinDefinedColor = 0,
+        Green = 0,
         Red,
         Yellow,
-        Blue
+        Blue,
+        MaxDefinedColor = Blue,
     }
 
     public enum CardValue
