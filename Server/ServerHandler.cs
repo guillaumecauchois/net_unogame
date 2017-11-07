@@ -1,4 +1,4 @@
-﻿namespace cardGames.Server
+﻿namespace Server
 {
     using System;
     using System.Net;

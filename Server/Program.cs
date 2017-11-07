@@ -1,4 +1,6 @@
-﻿namespace cardGames.Server
+﻿using Common;
+
+namespace Server
 {
     using System;
     using System.Threading.Tasks;
@@ -50,6 +52,9 @@
         public static int Main(string[] args)
         {
             int port;
+            Common.CardSimple cSimple;
+            
+            cSimple = new CardSimple(CardColor.Red, CardValue.Two);
 
             if (args.Length != 1)
             {
