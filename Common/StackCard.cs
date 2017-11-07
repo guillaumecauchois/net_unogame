@@ -42,7 +42,20 @@ namespace Common
 
         public void GenerateDeck()
         {
-            
+            for (int i = 1; i < (int) Common.CardColor.Blue + 1; i++)
+            {
+                AddCard(new Common.Card((Common.CardColor)i, Common.CardValue.Zero));
+                for (int y = 2; y < (int) Common.CardValue.ChangeColor; y++)
+                {
+                    AddCard((new Common.Card((Common.CardColor)i, (Common.CardValue)y)));  
+                    AddCard(new Common.Card((Common.CardColor)i, (Common.CardValue)y));
+                }
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                AddCard(new Common.Card(Common.CardColor.Undefined, Common.CardValue.Plus4));
+                AddCard(new Common.Card(Common.CardColor.Undefined, Common.CardValue.ChangeColor));
+            }
         }
 
         public void Clear()
