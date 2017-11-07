@@ -1,13 +1,74 @@
 ﻿using System;
 
-namespace cardGames
+namespace SecureChat.Client
 {
-    internal class Program
+    using System;
+    using System.IO;
+    using System.Net;
+    using System.Net.Security;
+    using System.Security.Cryptography.X509Certificates;
+    using System.Threading.Tasks;
+    using DotNetty.Codecs;
+    using DotNetty.Transport.Bootstrapping;
+    using DotNetty.Transport.Channels;
+    using DotNetty.Transport.Channels.Sockets;
+    class Program
     {
-        public static void Main(string[] args)
+        static async Task RunClientAsync()
         {
-            Console.WriteLine("|******| UNO - CLIENT - C# .NET Project |*****|");
-            Console.WriteLine("Contributors: Guillaume CAUCHOIS & Pierre STASZAK");
+  
+            var group = new MultithreadEventLoopGroup();
+
+            X509Certificate2 cert = null;
+            string targetHost = null;
+  
+            try
+            {
+                var bootstrap = new Bootstrap();
+                bootstrap
+                    .Group(group)
+                    .Channel<TcpSocketChannel>()
+                    .Option(ChannelOption.TcpNodelay, true)
+                    .Handler(new ActionChannelInitializer<ISocketChannel>(channel =>
+                    {
+                        IChannelPipeline pipeline = channel.Pipeline;
+
+                        pipeline.AddLast(new DelimiterBasedFrameDecoder(8192, Delimiters.LineDelimiter()));
+                        pipeline.AddLast(new StringEncoder(), new StringDecoder(), new SecureChatClientHandler());
+                    }));
+
+                IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(ClientSettings.Host, ClientSettings.Port));
+
+                for (;;)
+                {
+                    string line = Console.ReadLine();
+                    if (string.IsNullOrEmpty(line))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        await bootstrapChannel.WriteAndFlushAsync(line + "\r\n");
+                    }
+                    catch
+                    {
+                    }
+                    if (string.Equals(line, "bye", StringComparison.OrdinalIgnoreCase))
+                    {
+                        await bootstrapChannel.CloseAsync();
+                        break;
+                    }
+                }
+
+                await bootstrapChannel.CloseAsync();
+            }
+            finally
+            {
+                group.ShutdownGracefullyAsync().Wait(1000);
+            }
         }
+
+        static void Main() => RunClientAsync().Wait();
     }
 }
