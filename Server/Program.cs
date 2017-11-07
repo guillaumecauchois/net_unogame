@@ -52,9 +52,6 @@ namespace Server
         public static int Main(string[] args)
         {
             int port;
-            Common.CardSimple cSimple;
-            
-            cSimple = new CardSimple(CardColor.Red, CardValue.Two);
 
             if (args.Length != 1)
             {
