@@ -35,13 +35,13 @@
         private CardColor _color;
         private CardValue _value;
 
-        public Card(CardColor color, CardValue value)
+        protected Card(CardColor color, CardValue value)
         {
             this._color = color;
             this._value = value;
         }
         
-        public virtual void handleUse()
+        public virtual void HandleUse()
         {
             
         }
