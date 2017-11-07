@@ -6,12 +6,14 @@
         Undefined,
         Green,
         Red,
-        Yellow
+        Yellow,
+        Blue
     }
 
     public enum CardValue
     {
         Undefined,
+        Zero,
         One,
         Two,
         Three,
@@ -22,14 +24,14 @@
         Eight,
         Nine,
         Plus2,
-        Plus4,
         Revert,
         PassTurn,
-        ChangeLog
+        ChangeColor,
+        Plus4
     }
     
     /* Class Card */
-    public abstract class Card
+    public class Card
     {
         /* Attributs */
         private CardColor _color;
