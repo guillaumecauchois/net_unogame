@@ -12,6 +12,11 @@ namespace Common
         {
             
         }
+
+        public void AddCard(Card card)
+        {
+            _cards.Add(card);
+        }
         
         public bool PutCardOnTable(Table table, Card card)
         {

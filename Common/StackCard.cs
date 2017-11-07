@@ -6,35 +6,48 @@ namespace Common
     public class StackCard
     {
         private List<Card> _stack;
-        
+
         public StackCard()
         {
-            
+            _stack = new List<Card>();
         }
 
         public void AddCard(Card card)
         {
-            this._stack.Add(card);
+            _stack.Add(card);
         }
 
         public Card GetRandomCard()
         {
             // Get Stack Lenght
-            var lenght = this._stack.Count;
+            var lenght = _stack.Count;
             if (lenght == 0)
                 throw new Exception("StackCard is empty");
 
             // Generate the index of the random card
-            Random random = new Random();
+            var random = new Random();
             var idxRandom = random.Next(0, lenght + 1);
             
             // Send the random card
-            return (this._stack.ToArray()[idxRandom]);
+            return (_stack.ToArray()[idxRandom]);
+        }
+        
+        public Card PopRandomCard()
+        {
+            Card card = GetRandomCard();
+
+            _stack.Remove(card);
+            return (card);
         }
 
         public void GenerateDeck()
         {
             
+        }
+
+        public void Clear()
+        {
+            _stack.Clear();
         }
     }
 }
