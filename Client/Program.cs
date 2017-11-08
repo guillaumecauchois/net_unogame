@@ -1,4 +1,5 @@
 ﻿using System;
+using Common;
 
 namespace SecureChat.Client
 {
@@ -69,6 +70,23 @@ namespace SecureChat.Client
             }
         }
 
-        static void Main() => RunClientAsync().Wait();
+        //static void Main() => RunClientAsync().Wait();
+        //(EventType type, Table table, Player player)
+        static void Main()
+        {
+            var lol1 = new Card(CardColor.Blue, CardValue.Eight);
+            var lol2 = new Card(CardColor.Green, CardValue.PassTurn);
+            var lol3 = new Card(CardColor.Red, CardValue.Plus2);
+            var table = new Table();
+            
+            var guigui = new Player("guigui");
+            guigui.GetHand().AddCard(lol1);
+            guigui.GetHand().AddCard(lol2);
+            guigui.GetHand().AddCard(lol3);
+            
+            var bito = new Event(EventType.YourTurn, table, guigui);
+            var touken = new EventHandler();
+            touken.HandleEvent(bito);
+        }
     }
 }

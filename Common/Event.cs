@@ -1,9 +1,11 @@
-﻿namespace Common
+﻿using System;
+
+namespace Common
 {
     public enum EventType
     {
         InvalidCommand = -1,
-        YouTurn = 0,
+        YourTurn = 0,
         PlayerTurn,
         PlayerHasPlayed,
         EndGame,
@@ -14,12 +16,14 @@
         private Table        _table;
         private Player       _player;
         private EventType    _type;
+        private bool         _hasDraw;
 
         public Event(EventType type, Table table, Player player)
         {
             _player = player;
             _table = table;
             _type = type;
+            _hasDraw = false;
         }
 
         public void SetTable(Table table)
@@ -50,6 +54,16 @@
         public EventType GetEventType()
         {
             return _type;
+        }
+
+        public bool GetHasDraw()
+        {
+            return _hasDraw;
+        }
+
+        public void SetHasDraw(bool state)
+        {
+            _hasDraw = state;
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Common
 
         public Hand()
         {
-            
+            _cards = new List<Card>();   
         }
 
         public void AddCard(Card card)
@@ -26,6 +26,15 @@ namespace Common
             this._cards.Remove(card);
             table.AddCard(card);
             return (true);
+        }
+
+        public void DisplayHand(CardBeautifuler beautifuler)
+        {
+            Console.WriteLine("Your cards :");
+            foreach (var card in _cards)
+            {
+                Console.WriteLine(beautifuler.GetStringCard(card));
+            }
         }
     }
 }

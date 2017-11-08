@@ -3,9 +3,9 @@
     /* Enumeration definitions */
     public enum CardColor
     {
-        Undefined = -1,
         MinDefinedColor = 0,
-        Green = 0,
+        Undefined = 0,
+        Green,
         Red,
         Yellow,
         Blue,
@@ -14,8 +14,9 @@
 
     public enum CardValue
     {
-        Undefined,
-        Zero,
+        Undefined = -1,
+        MinDefinedValue = 0,
+        Zero = 0,
         One,
         Two,
         Three,
@@ -29,7 +30,8 @@
         Revert,
         PassTurn,
         ChangeColor,
-        Plus4
+        Plus4,
+        MaxDefinedValue = Plus4,
     }
     
     /* Class Card */
@@ -48,6 +50,16 @@
         public virtual void HandleUse()
         {
             
+        }
+
+        public CardColor GetCardColor()
+        {
+            return _color;
+        }
+
+        public CardValue GetCardValue()
+        {
+            return _value;
         }
     }
 }
