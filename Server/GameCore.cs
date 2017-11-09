@@ -13,7 +13,6 @@ namespace Server
         
         public GameCore()
         {
-            Table = new Table();
         }
 
         public void RunContainers()
