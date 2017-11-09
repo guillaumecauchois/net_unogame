@@ -51,6 +51,20 @@ namespace Common
                 throw new Exception("Sorry but the game is already started ...");
         }
 
+        /*
+        private Player GetNextPlayer()
+        {
+           Players.Find()
+        }
+        */
+        
+        public void RemovePlayer(Player player)
+        {
+            if (CurrentPlayer == player)
+                
+            Players.Remove(player);
+        }
+        
         public void StartGame()
         {
             if (Players.Count < 2 || Players.Count > 10)
@@ -101,7 +115,7 @@ namespace Common
             {
                 if (currentPlayer != player)
                 {
-                    player.Context.WriteAndFlushAsync(serObj);
+                    player.Context.WriteAndFlushAsync(serObj + "\r\n");
                 }
             }
         }

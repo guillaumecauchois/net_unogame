@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using DotNetty.Transport.Channels;
 using ProtoBuf;
 
@@ -7,6 +8,15 @@ namespace Common
     [ProtoContract]
     public class Player
     {
+        public Player()
+        {
+            this.Id = _idGenerator;
+            this.Hand = new Hand();
+            this.Context = null;
+            _idGenerator++;
+            Console.Write("\n[{0}] Join the game\n$> ", this.Id);
+        }
+        
         public Player(IChannelHandlerContext context)
         {
             this.Id = _idGenerator;

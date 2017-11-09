@@ -10,7 +10,6 @@ namespace Server
     
     public class ServerHandler : SimpleChannelInboundHandler<string>
     {
-        static volatile IChannelGroup   _group;
         private GameCore                _gameCore;
 
         public ServerHandler(GameCore gameCore) : base()
@@ -32,10 +31,18 @@ namespace Server
             }
         }
 
-        public override void HandlerRemoved(IChannelHandlerContext context)
+        /* public override void HandlerRemoved(IChannelHandlerContext context)
         {
             base.HandlerRemoved(context);
-        }
+            try
+            {
+                _gameCore.Table.RemovePlayer();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine();
+            }
+        } */
 
         protected override void ChannelRead0(IChannelHandlerContext contex, string msg)
         {

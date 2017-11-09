@@ -63,7 +63,7 @@ namespace Server
             /* Notify current player that is now his turn */
             var e = new Event(EventType.YourTurn, currentPlayer, Table);
             var serObj = SerializeHandler.SerializeObj(e);
-            currentPlayer.Context.WriteAndFlushAsync(serObj);
+            currentPlayer.Context.WriteAndFlushAsync(serObj + "\r\n");
                 
             /* Notify other players that is turn of "current_player" */
             e = new Event(EventType.PlayerTurn, currentPlayer, Table);
