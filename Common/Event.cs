@@ -48,7 +48,7 @@ namespace Common
         [ProtoMember(3)]
         public string ErrorMsg { get; set; }
         [ProtoMember(4)]
-        private Table Table { get; set; }
+        public Table Table { get; set; }
         [ProtoMember(5)]
         public bool HasDraw { get; set; }
         

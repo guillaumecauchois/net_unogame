@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Common;
 
 namespace Client
@@ -12,13 +13,15 @@ namespace Client
         public ClientEventHandler()
         {
             Event = null;
-            _events = new ClientEventHandlerCmd[5];
-            _events[0] = new ClientEventHandlerCmd(HandleEventYourTurn);
-            _events[1] = new ClientEventHandlerCmd(HandleEventPlayerTurn);
-            _events[2] = new ClientEventHandlerCmd(HandleEventEndGame);
-            _events[3] = new ClientEventHandlerCmd(HandleEventPlayerHasPlayed);
-            _events[4] = new ClientEventHandlerCmd(HandleEventInvalidCommand);
-            _beautifuler = new CardBeautifuler();
+            var _events = new Dictionary<EventType, ClientEventHandlerCmd>
+            {
+                {EventType.YourTurn, HandleEventYourTurn},
+                {EventType.PlayerTurn, HandleEventPlayerTurn},
+                {EventType.EndGame, HandleEventEndGame},
+                {EventType.PlayerHasPlayed, HandleEventPlayerHasPlayed},
+                {EventType.InvalidCommand, HandleEventInvalidCommand}
+            };
+
         }
         
         public Event Event { get; set; }
@@ -26,7 +29,15 @@ namespace Client
         public void HandleEvent(Event eventReceived)
         {
             Event = eventReceived;
-            _events[(int)Event.Type]();
+            Console.WriteLine("TableType : {0} - HasDraw : {1} - pId : {2}", eventReceived.Table.Status, eventReceived.HasDraw, eventReceived.Player.Id);
+            try
+            {
+                _events[(int)eventReceived.Type].Invoke();
+            }
+            catch (Exception e)
+            {
+                Console.Error.Write("[ERR] Receive invalid Event Type : " + eventReceived.Type);
+            }
         }
 
         private void HandleEventInvalidCommand()

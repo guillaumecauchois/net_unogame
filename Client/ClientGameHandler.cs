@@ -39,7 +39,6 @@ namespace Client
                 Console.WriteLine("NOT YOUR TURN");
                 return;
             }
-            handler.Event.Player.Hand.DisplayHand(beautiful);
         }
         
         public void HandleDrawCmd(ClientEventHandler handler, string[] args)
