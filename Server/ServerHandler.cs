@@ -10,12 +10,12 @@ namespace Server
     
     public class ServerHandler : SimpleChannelInboundHandler<string>
     {
-        static volatile IChannelGroup group;
-        private GameCore GameCore;
+        static volatile IChannelGroup   _group;
+        private GameCore                _gameCore;
 
         public ServerHandler(GameCore gameCore) : base()
         {
-            GameCore = gameCore;
+            _gameCore = gameCore;
         }
 
         public override void HandlerAdded(IChannelHandlerContext context)
@@ -24,7 +24,7 @@ namespace Server
             var p = new Player(context);
             try
             {
-                GameCore.Table.AddPlayer(p);
+                _gameCore.Table.AddPlayer(p);
             }
             catch (Exception e)
             {
@@ -32,21 +32,14 @@ namespace Server
             }
         }
 
-        private class EveryOneBut : IChannelMatcher
+        public override void HandlerRemoved(IChannelHandlerContext context)
         {
-            readonly IChannelId id;
-
-            public EveryOneBut(IChannelId id)
-            {
-                this.id = id;
-            }
-
-            public bool Matches(IChannel channel) => !channel.Id.Equals(this.id);
+            base.HandlerRemoved(context);
         }
 
         protected override void ChannelRead0(IChannelHandlerContext contex, string msg)
         {
-            GameCore.HandleTurnResponse(contex, msg);
+            _gameCore.HandleTurnResponse(contex, msg);
         }
 
         public override void ChannelReadComplete(IChannelHandlerContext ctx) => ctx.Flush();
