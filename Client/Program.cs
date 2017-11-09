@@ -16,6 +16,7 @@ namespace Client
     {
         
         public static ClientGameHandler GameHandler = new ClientGameHandler();
+        public static ClientHandler saucisse = new ClientHandler();
         
         static async Task RunClientAsync()
         {
@@ -36,10 +37,10 @@ namespace Client
                         IChannelPipeline pipeline = channel.Pipeline;
 
                         pipeline.AddLast(new DelimiterBasedFrameDecoder(8192, Delimiters.LineDelimiter()));
-                        pipeline.AddLast(new StringEncoder(), new StringDecoder(), new ClientHandler());
+                        pipeline.AddLast(new StringEncoder(), new StringDecoder(), saucisse);
                     }));
 
-                IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(ClientSettings.Host, ClientSettings.Port));
+                IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse("10.26.113.8"), 4242));
 
                 for (;;)
                 {
@@ -52,7 +53,7 @@ namespace Client
 
                     try
                     {
-                        //GameHandler.HandleClientCmd(saucisse.getEventHandler(), line);
+                        GameHandler.HandleClientCmd(saucisse.GetEventHandler(), line);
                         //Console.WriteLine(line);
                         //await bootstrapChannel.WriteAndFlushAsync(line + "\r\n");
                     }
