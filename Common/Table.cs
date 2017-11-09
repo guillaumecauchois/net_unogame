@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using DotNetty.Transport.Channels;
 using ProtoBuf;
 
 namespace Common
@@ -21,7 +22,7 @@ namespace Common
         [ProtoMember(3)] public GameStatus                     Status = GameStatus.NotStarted;
         [ProtoMember(4)] private Player                        Winner { get; set; }
         [ProtoMember(6)] public Player                         CurrentPlayer { set; get; }
-        [ProtoMember(5)] private List<Player>                  Players;
+        [ProtoMember(5)] public List<Player>                   Players;
 
         public Table()
         {
@@ -56,6 +57,7 @@ namespace Common
                 throw new Exception("Invalid team size");
             ResetGamePlay();
             StackCard.GenerateDeck();
+            DistributeCardToPlayers();
             Status = GameStatus.Running;
             CurrentPlayer = Players.First();
         }
@@ -74,14 +76,15 @@ namespace Common
             CurrentPlayer = null;
             Status = GameStatus.NotStarted;
         }
-        
-        public void DistributeCardToPlayers()
+
+        private void DistributeCardToPlayers()
         {
             if (!Status.Equals(GameStatus.NotStarted))
                 throw new Exception("The game must be not started for distribute cards.");
             foreach (var player in Players)
             {
-                player.Hand.AddCard(StackCard.PopRandomCard());
+                for (var i = 0; i != 7; ++i)
+                    player.Hand.AddCard(StackCard.PopRandomCard());
             }
         }
 
@@ -101,6 +104,16 @@ namespace Common
                     player.Context.WriteAndFlushAsync(serObj);
                 }
             }
+        }
+
+        public Player GetPlayerByContext(IChannelHandlerContext context)
+        {
+            foreach (var player in Players)
+            {
+                if (player.Context == context)
+                    return player;
+            }
+            throw new Exception("Cannot find player associate to TurnResponse");
         }
     }
 }

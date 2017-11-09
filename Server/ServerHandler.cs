@@ -17,23 +17,11 @@ namespace Server
         {
             GameCore = gameCore;
         }
-        
-        public override void ChannelActive(IChannelHandlerContext contex)
+
+        public override void HandlerAdded(IChannelHandlerContext context)
         {
-            var g = group;
-            
-            if (g == null)
-            {
-                lock (this)
-                {
-                    if (group == null)
-                    {
-                        g = group = new DefaultChannelGroup(contex.Executor);
-                    }
-                }
-            }
-            var p = new Player(contex);
-            g.Add(contex.Channel);
+            base.HandlerAdded(context);
+            var p = new Player(context);
             try
             {
                 GameCore.Table.AddPlayer(p);
@@ -58,15 +46,14 @@ namespace Server
 
         protected override void ChannelRead0(IChannelHandlerContext contex, string msg)
         {
-            //   group.WriteAndFlushAsync(broadcast, new EveryOneBut(contex.Channel.Id));
-            // contex.WriteAndFlushAsync(response);
+            GameCore.HandleTurnResponse(contex, msg);
         }
 
         public override void ChannelReadComplete(IChannelHandlerContext ctx) => ctx.Flush();
 
         public override void ExceptionCaught(IChannelHandlerContext ctx, Exception e)
         {
-            Console.Error.WriteLine("{0}", e.StackTrace);
+            Console.Error.WriteLine(e.StackTrace);
             ctx.CloseAsync();
         }
 

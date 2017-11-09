@@ -26,5 +26,10 @@ namespace Common
         
         /* Non-Serialize Prop */
         public IChannelHandlerContext Context { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Id}\t *HandSize = {Hand.cards.Count} ";
+        }
     }
 }
