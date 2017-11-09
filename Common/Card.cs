@@ -47,6 +47,12 @@ namespace Common
         [ProtoMember(2)]
         public CardValue Value { get; set; }
 
+        public Card()
+        {
+            Color = CardColor.Undefined;
+            Value = CardValue.Undefined;
+        }
+        
         public Card(CardColor color, CardValue value)
         {
             Color = color;
