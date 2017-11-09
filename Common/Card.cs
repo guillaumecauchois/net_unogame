@@ -43,29 +43,19 @@ namespace Common
     {
         /* Attributs */
         [ProtoMember(1)]
-        private CardColor _color;
+        public CardColor Color { get; set; }
         [ProtoMember(2)]
-        private CardValue _value;
+        public CardValue Value { get; set; }
 
         public Card(CardColor color, CardValue value)
         {
-            this._color = color;
-            this._value = value;
+            Color = color;
+            Value = value;
         }
         
         public virtual void HandleUse()
         {
             
-        }
-
-        public CardColor GetCardColor()
-        {
-            return _color;
-        }
-
-        public CardValue GetCardValue()
-        {
-            return _value;
         }
     }
 }

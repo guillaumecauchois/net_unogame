@@ -4,13 +4,13 @@ namespace Common
 {
     public class CardBeautifuler
     {
-        private string[] _cardColors;
-        private string[] _cardTypes;
+        private string[] CardColors;
+        private string[] CardTypes;
 
         public CardBeautifuler()
         {
-            _cardColors = new string[] {"Undefined", "Green", "Red", "Yellow", "Blue"};
-            _cardTypes = new string[]
+            CardColors = new string[] {"Undefined", "Green", "Red", "Yellow", "Blue"};
+            CardTypes = new string[]
             {
                 "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Plus_2", "Revert",
                 "PassTurn", "ChangeColor", "Plus4"
@@ -19,7 +19,7 @@ namespace Common
 
         public string GetStringCard(Card card)
         {
-            return string.Concat(_cardColors[(int) card.GetCardColor()], " ", _cardTypes[(int) card.GetCardValue()]);
+            return string.Concat(CardColors[(int) card.Color], " ", CardTypes[(int) card.Value]);
         }
     }
 }

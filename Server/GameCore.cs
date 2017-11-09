@@ -70,10 +70,23 @@ namespace Server
             Table.SendObjectToOtherPlayers(e, currentPlayer);
         }
 
-        public void HandleTurnResponse(IChannelHandlerContext contex, string msg)
+        public void HandleTurnResponse(IChannelHandlerContext context, string msg)
         {
-            Player currentPlayer;
-            
+            try
+            {
+                var tResponse =
+                    SerializeHandler.DeserializeObject<TurnResponse>(msg); 
+                
+                var currentPlayer = Table.GetPlayerByContext(context);
+                if (TurnResponseHandler.Handle(tResponse, currentPlayer, Table) == -1)
+                {
+                    Console.Error.WriteLine("[ERR] Receive information from unknowned player");
+                }
+            }
+            catch (SerializeHandlerException e)
+            {
+                Console.Error.WriteLine("[ERR] Receive invalid information from a client");
+            }
         }
     }
 }
