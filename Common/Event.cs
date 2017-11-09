@@ -8,7 +8,7 @@ namespace Common
     public enum EventType
     {
         InvalidCommand = -1,
-        YouTurn = 0,
+        YourTurn = 0,
         PlayerTurn,
         PlayerHasPlayed,
         EndGame,
@@ -40,13 +40,15 @@ namespace Common
         }
         
         [ProtoMember(1)]
-        private Player Player { get; set; }
+        public Player Player { get; set; }
         [ProtoMember(2)]
         public EventType Type { get; set; }
         [ProtoMember(3)]
         public string ErrorMsg { get; set; }
         [ProtoMember(4)]
         private Table Table { get; set; }
+        [ProtoMember(5)]
+        public bool HasDraw { get; set; }
         
     }
 }

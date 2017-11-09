@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Common;
+using SecureChat.Client;
 
 namespace Client
 {
     using System;
-    using System.IO;
     using System.Net;
-    using System.Net.Security;
-    using System.Security.Cryptography.X509Certificates;
     using System.Threading.Tasks;
     using DotNetty.Codecs;
     using DotNetty.Transport.Bootstrapping;
@@ -20,7 +18,6 @@ namespace Client
   
             var group = new MultithreadEventLoopGroup();
 
-            X509Certificate2 cert = null;
             string targetHost = null;
   
             try
@@ -35,7 +32,7 @@ namespace Client
                         IChannelPipeline pipeline = channel.Pipeline;
 
                         pipeline.AddLast(new DelimiterBasedFrameDecoder(8192, Delimiters.LineDelimiter()));
-                        pipeline.AddLast(new StringEncoder(), new StringDecoder(), new SecureChatClientHandler());
+                        pipeline.AddLast(new StringEncoder(), new StringDecoder(), new ClientHandler());
                     }));
 
                 IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(ClientSettings.Host, ClientSettings.Port));
@@ -54,6 +51,7 @@ namespace Client
                     }
                     catch
                     {
+                        // ignored
                     }
                     if (string.Equals(line, "bye", StringComparison.OrdinalIgnoreCase))
                     {
@@ -70,6 +68,26 @@ namespace Client
             }
         }
 
-        static void Main() => RunClientAsync().Wait();
+        //static void Main() => RunClientAsync().Wait();
+        //(EventType type, Table table, Player player)
+        static void Main()
+        {
+            var lol1 = new Card(CardColor.Blue, CardValue.Eight);
+            var lol2 = new Card(CardColor.Green, CardValue.PassTurn);
+            var lol3 = new Card(CardColor.Red, CardValue.Plus2);
+            var table = new Table();
+            
+            var guigui = new Player(null);
+            guigui.Hand.AddCard(lol1);
+            guigui.Hand.AddCard(lol2);
+            guigui.Hand.AddCard(lol3);
+            
+            var bito = new Event(EventType.YourTurn, guigui, table);
+            /**
+             * PIERRE - ATTENTION AU NOM DE CETTE CLASSE CAR System.EventHandler existe déjà.
+             */
+            //var touken = new EventHandler();
+            //touken.HandleEvent(bito);
+        }
     }
 }
