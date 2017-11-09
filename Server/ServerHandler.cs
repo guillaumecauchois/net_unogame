@@ -10,33 +10,20 @@ namespace Server
     
     public class ServerHandler : SimpleChannelInboundHandler<string>
     {
-        static volatile IChannelGroup group;
-        private GameCore GameCore;
+        private GameCore                _gameCore;
 
         public ServerHandler(GameCore gameCore) : base()
         {
-            GameCore = gameCore;
+            _gameCore = gameCore;
         }
-        
-        public override void ChannelActive(IChannelHandlerContext contex)
+
+        public override void HandlerAdded(IChannelHandlerContext context)
         {
-            var g = group;
-            
-            if (g == null)
-            {
-                lock (this)
-                {
-                    if (group == null)
-                    {
-                        g = group = new DefaultChannelGroup(contex.Executor);
-                    }
-                }
-            }
-            var p = new Player(contex);
-            g.Add(contex.Channel);
+            base.HandlerAdded(context);
+            var p = new Player(context);
             try
             {
-                GameCore.Table.AddPlayer(p);
+                _gameCore.Table.AddPlayer(p);
             }
             catch (Exception e)
             {
@@ -44,29 +31,29 @@ namespace Server
             }
         }
 
-        private class EveryOneBut : IChannelMatcher
+        /* public override void HandlerRemoved(IChannelHandlerContext context)
         {
-            readonly IChannelId id;
-
-            public EveryOneBut(IChannelId id)
+            base.HandlerRemoved(context);
+            try
             {
-                this.id = id;
+                _gameCore.Table.RemovePlayer();
             }
-
-            public bool Matches(IChannel channel) => !channel.Id.Equals(this.id);
-        }
+            catch (Exception e)
+            {
+                Console.WriteLine();
+            }
+        } */
 
         protected override void ChannelRead0(IChannelHandlerContext contex, string msg)
         {
-            //   group.WriteAndFlushAsync(broadcast, new EveryOneBut(contex.Channel.Id));
-            // contex.WriteAndFlushAsync(response);
+            _gameCore.HandleTurnResponse(contex, msg);
         }
 
         public override void ChannelReadComplete(IChannelHandlerContext ctx) => ctx.Flush();
 
         public override void ExceptionCaught(IChannelHandlerContext ctx, Exception e)
         {
-            Console.Error.WriteLine("{0}", e.StackTrace);
+            Console.Error.WriteLine(e.StackTrace);
             ctx.CloseAsync();
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using DotNetty.Transport.Channels;
 using ProtoBuf;
 
 namespace Common
@@ -21,7 +22,7 @@ namespace Common
         [ProtoMember(3)] public GameStatus                     Status = GameStatus.NotStarted;
         [ProtoMember(4)] private Player                        Winner { get; set; }
         [ProtoMember(6)] public Player                         CurrentPlayer { set; get; }
-        [ProtoMember(5)] private List<Player>                  Players;
+        [ProtoMember(5)] public List<Player>                   Players;
 
         public Table()
         {
@@ -50,12 +51,27 @@ namespace Common
                 throw new Exception("Sorry but the game is already started ...");
         }
 
+        /*
+        private Player GetNextPlayer()
+        {
+           Players.Find()
+        }
+        */
+        
+        public void RemovePlayer(Player player)
+        {
+            if (CurrentPlayer == player)
+                
+            Players.Remove(player);
+        }
+        
         public void StartGame()
         {
             if (Players.Count < 2 || Players.Count > 10)
                 throw new Exception("Invalid team size");
             ResetGamePlay();
             StackCard.GenerateDeck();
+            DistributeCardToPlayers();
             Status = GameStatus.Running;
             CurrentPlayer = Players.First();
         }
@@ -74,14 +90,15 @@ namespace Common
             CurrentPlayer = null;
             Status = GameStatus.NotStarted;
         }
-        
-        public void DistributeCardToPlayers()
+
+        private void DistributeCardToPlayers()
         {
             if (!Status.Equals(GameStatus.NotStarted))
                 throw new Exception("The game must be not started for distribute cards.");
             foreach (var player in Players)
             {
-                player.Hand.AddCard(StackCard.PopRandomCard());
+                for (var i = 0; i != 7; ++i)
+                    player.Hand.AddCard(StackCard.PopRandomCard());
             }
         }
 
@@ -98,9 +115,19 @@ namespace Common
             {
                 if (currentPlayer != player)
                 {
-                    player.Context.WriteAndFlushAsync(serObj);
+                    player.Context.WriteAndFlushAsync(serObj + "\r\n");
                 }
             }
+        }
+
+        public Player GetPlayerByContext(IChannelHandlerContext context)
+        {
+            foreach (var player in Players)
+            {
+                if (player.Context == context)
+                    return player;
+            }
+            throw new Exception("Cannot find player associate to TurnResponse");
         }
     }
 }

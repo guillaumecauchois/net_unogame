@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using ProtoBuf;
 
 namespace Common
@@ -8,25 +7,24 @@ namespace Common
     [ProtoContract]
     public class Hand
     {
-        [ProtoMember(1)]
-        private List<Card> _cards;
+        [ProtoMember(1)] public List<Card> cards;
 
         public Hand()
         {
-            _cards = new List<Card>();   
+            cards = new List<Card>();   
         }
 
         public void AddCard(Card card)
         {
-            _cards.Add(card);
+            cards.Add(card);
         }
         
         public bool PutCardOnTable(Table table, Card card)
         {
             card.HandleUse();
-            if (!this._cards.Contains(card))
+            if (!this.cards.Contains(card))
                 return (false);
-            this._cards.Remove(card);
+            this.cards.Remove(card);
             table.AddCard(card);
             return (true);
         }
@@ -34,8 +32,9 @@ namespace Common
         public void DisplayHand(CardBeautifuler beautifuler)
         {
             Console.WriteLine("Your cards :");
-            var index = 1;
-            foreach (var card in _cards)
+
+            var index = 0;
+            foreach (var card in cards)
             {
                 Console.WriteLine(index + " : " + beautifuler.GetStringCard(card));
                 index++;
