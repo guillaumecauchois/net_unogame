@@ -11,8 +11,12 @@ namespace Client
     using DotNetty.Transport.Channels;
     using DotNetty.Transport.Channels.Sockets;
     
+    
     class Program
     {
+        
+        public static ClientGameHandler GameHandler = new ClientGameHandler();
+        
         static async Task RunClientAsync()
         {
   
@@ -39,6 +43,7 @@ namespace Client
 
                 for (;;)
                 {
+                    Console.Write("$> ");
                     string line = Console.ReadLine();
                     if (string.IsNullOrEmpty(line))
                     {
@@ -47,7 +52,9 @@ namespace Client
 
                     try
                     {
-                        await bootstrapChannel.WriteAndFlushAsync(line + "\r\n");
+                        //GameHandler.HandleClientCmd(saucisse.getEventHandler(), line);
+                        //Console.WriteLine(line);
+                        //await bootstrapChannel.WriteAndFlushAsync(line + "\r\n");
                     }
                     catch
                     {
@@ -68,26 +75,6 @@ namespace Client
             }
         }
 
-        //static void Main() => RunClientAsync().Wait();
-        //(EventType type, Table table, Player player)
-        static void Main()
-        {
-            var lol1 = new Card(CardColor.Blue, CardValue.Eight);
-            var lol2 = new Card(CardColor.Green, CardValue.PassTurn);
-            var lol3 = new Card(CardColor.Red, CardValue.Plus2);
-            var table = new Table();
-            
-            var guigui = new Player(null);
-            guigui.Hand.AddCard(lol1);
-            guigui.Hand.AddCard(lol2);
-            guigui.Hand.AddCard(lol3);
-            
-            var bito = new Event(EventType.YourTurn, guigui, table);
-            /**
-             * PIERRE - ATTENTION AU NOM DE CETTE CLASSE CAR System.EventHandler existe déjà.
-             */
-            //var touken = new EventHandler();
-            //touken.HandleEvent(bito);
-        }
+        static void Main() => RunClientAsync().Wait();
     }
 }

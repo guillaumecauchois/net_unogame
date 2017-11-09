@@ -14,6 +14,7 @@ namespace Common
             this.Context = context;
             _idGenerator++;
             Console.Write("\n[{0}] Join the game\n$> ", this.Id);
+            context.WriteAndFlushAsync("BIENVENUE MAMENE !!!");
         }
 
         /* Serialized Prop */

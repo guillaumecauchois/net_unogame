@@ -22,6 +22,7 @@ namespace Common
             Player = null;
             Table = null;
             ErrorMsg = null;
+            HasDraw = false;
             Type = EventType.InvalidCommand;
         }
         
@@ -36,6 +37,7 @@ namespace Common
             Type = type;
             Player = player;
             Table = table;
+            HasDraw = false;
             ErrorMsg = null;
         }
         
