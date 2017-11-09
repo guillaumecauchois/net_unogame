@@ -31,9 +31,11 @@ namespace Common
         public void DisplayHand(CardBeautifuler beautifuler)
         {
             Console.WriteLine("Your cards :");
+            var index = 1;
             foreach (var card in _cards)
             {
-                Console.WriteLine(beautifuler.GetStringCard(card));
+                Console.WriteLine(index + " : " + beautifuler.GetStringCard(card));
+                index++;
             }
         }
     }
