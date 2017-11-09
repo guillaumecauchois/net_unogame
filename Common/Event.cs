@@ -7,8 +7,8 @@ namespace Common
 {
     public enum EventType
     {
-        InvalidCommand = -1,
-        YourTurn = 0,
+        InvalidCommand = 0,
+        YourTurn,
         PlayerTurn,
         PlayerHasPlayed,
         EndGame,
