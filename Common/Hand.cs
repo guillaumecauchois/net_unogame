@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using ProtoBuf;
 
 namespace Common
@@ -33,9 +32,12 @@ namespace Common
         public void DisplayHand(CardBeautifuler beautifuler)
         {
             Console.WriteLine("Your cards :");
+
+            var index = 0;
             foreach (var card in cards)
             {
-                Console.WriteLine(beautifuler.GetStringCard(card));
+                Console.WriteLine(index + " : " + beautifuler.GetStringCard(card));
+                index++;
             }
         }
     }
