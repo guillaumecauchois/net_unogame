@@ -24,7 +24,7 @@ namespace SecureChat.Client
         public void HandleEvent(Event eventReceived)
         {
             _event = eventReceived;
-            _events[(int)_event.GetEventType()]();
+            _events[(int)_event.Type]();
         }
 
         private void HandleEventInvalidCommand()
@@ -35,7 +35,7 @@ namespace SecureChat.Client
         private void HandleEventYourTurn()
         {
             Console.WriteLine("It's your turn to play !");
-            _event.GetPlayer().GetHand().DisplayHand(_beautifuler);
+            _event.Player.Hand.DisplayHand(_beautifuler);
         }
 
         private void HandleEventEndGame()
@@ -45,7 +45,7 @@ namespace SecureChat.Client
 
         private void HandleEventPlayerTurn()
         {
-            Console.WriteLine("It's " + _event.GetPlayer().GetName() + " turn");
+            Console.WriteLine("It's turn of player#" + _event.Player.Id);
         }
 
         private void HandleEventPlayerHasPlayed()

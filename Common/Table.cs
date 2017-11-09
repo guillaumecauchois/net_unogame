@@ -1,66 +1,105 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using ProtoBuf;
 
 namespace Common
 {
-    enum GameStatus
+    public enum GameStatus
     {
         NotStarted,
         Running,
         End
     }
     
+    [ProtoContract]
     public class Table
     {
-        private StackCard     _history;
-        private StackCard     _stackCard;
-        private GameStatus    _status;
-        private Player        _winner;
-        private List<Player>  _players;
+        [ProtoMember(1, IsRequired = true)] private StackCard  History;
+        [ProtoMember(2, IsRequired = true)] private StackCard  StackCard;
+        [ProtoMember(3)] public GameStatus                     Status = GameStatus.NotStarted;
+        [ProtoMember(4)] private Player                        Winner { get; set; }
+        [ProtoMember(6)] public Player                         CurrentPlayer { set; get; }
+        [ProtoMember(5)] private List<Player>                  Players;
 
         public Table()
         {
-            _history = new StackCard();
-            _stackCard = new StackCard();
-            _status = GameStatus.NotStarted;
-            _winner = null;
-            _players = new List<Player>();
+            History = new StackCard();
+            StackCard = new StackCard();
+            Status = GameStatus.NotStarted;
+            Winner = null;
+            Players = new List<Player>();
         }
         
         public bool PutCardOnTable(Player player, Card card)
         {
-            return (player.GetHand().PutCardOnTable(this, card));
+            return (player.Hand.PutCardOnTable(this, card));
         }
 
         public void AddCard(Card card)
         {
-            _history.AddCard(card);
+            History.AddCard(card);
         }
 
         public void AddPlayer(Player player)
         {
-            _players.Add(player);
+            if (Status == GameStatus.NotStarted)
+                Players.Add(player);
+            else
+                throw new Exception("Sorry but the game is already started ...");
         }
 
         public void StartGame()
         {
-            _history.Clear();
-            _winner = null;
+            if (Players.Count < 2 || Players.Count > 10)
+                throw new Exception("Invalid team size");
+            ResetGamePlay();
+            StackCard.GenerateDeck();
+            Status = GameStatus.Running;
+            CurrentPlayer = Players.First();
         }
         
         public void SetGameEnd(Player winner)
         {
-            _winner = winner;
-            _status = GameStatus.End;
+            Winner = winner;
+            Status = GameStatus.End;
         }
 
+        public void ResetGamePlay()
+        {
+            History.Clear();
+            StackCard.Clear();
+            Winner = null;
+            CurrentPlayer = null;
+            Status = GameStatus.NotStarted;
+        }
+        
         public void DistributeCardToPlayers()
         {
-            if (!_status.Equals(GameStatus.NotStarted))
+            if (!Status.Equals(GameStatus.NotStarted))
                 throw new Exception("The game must be not started for distribute cards.");
-            foreach (var player in _players)
+            foreach (var player in Players)
             {
-                player.GetHand().AddCard(_stackCard.PopRandomCard());
+                player.Hand.AddCard(StackCard.PopRandomCard());
+            }
+        }
+
+        public Card GetTopStackCard()
+        {
+            return History.GetTop();
+        }
+
+        public void SendObjectToOtherPlayers<T>(T obj, Player currentPlayer)
+        {
+            var serObj = SerializeHandler.SerializeObj(obj);
+
+            foreach (var player in Players)
+            {
+                if (currentPlayer != player)
+                {
+                    player.Context.WriteAndFlushAsync(serObj);
+                }
             }
         }
     }

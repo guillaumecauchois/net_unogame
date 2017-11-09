@@ -1,4 +1,6 @@
-﻿using Common;
+﻿using System.Collections.Generic;
+using System.Threading;
+using Common;
 
 namespace Server
 {
@@ -12,14 +14,16 @@ namespace Server
 
     class Program
     {
+        private static GameCore GameCore = new GameCore();
+        
         static async Task RunServerAsync(int port)
         {
             var bossGroup = new MultithreadEventLoopGroup(1);
             var workerGroup = new MultithreadEventLoopGroup();
 
-            var STRING_ENCODER = new StringEncoder();
-            var STRING_DECODER = new StringDecoder();
-            var SERVER_HANDLER = new ServerHandler();
+            var stringEncoder = new StringEncoder();
+            var stringDecoder = new StringDecoder();
+            var serverHandler = new ServerHandler(GameCore);
             
             try
             {
@@ -31,16 +35,15 @@ namespace Server
                     .Handler(new LoggingHandler(LogLevel.INFO))
                     .ChildHandler(new ActionChannelInitializer<ISocketChannel>(channel =>
                     {
-                        IChannelPipeline pipeline = channel.Pipeline;
+                        var pipeline = channel.Pipeline;
 
                         pipeline.AddLast(new DelimiterBasedFrameDecoder(8192, Delimiters.LineDelimiter()));
-                        pipeline.AddLast(STRING_ENCODER, STRING_DECODER, SERVER_HANDLER);
+                        pipeline.AddLast(stringEncoder, stringDecoder, serverHandler);
                     }));
 
-                IChannel bootstrapChannel = await bootstrap.BindAsync(port);
+                var bootstrapChannel = await bootstrap.BindAsync(port);
 
-                Console.ReadLine();
-
+                GameCore.RunContainers();
                 await bootstrapChannel.CloseAsync();
             }
             finally
