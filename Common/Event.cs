@@ -1,4 +1,9 @@
-﻿namespace Common
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using ProtoBuf;
+
+namespace Common
 {
     public enum EventType
     {
@@ -9,47 +14,39 @@
         EndGame,
     }
     
+    [ProtoContract]
     public class Event
     {
-        private Table        _table;
-        private Player       _player;
-        private EventType    _type;
-
-        public Event(EventType type, Table table, Player player)
+        public Event()
         {
-            _player = player;
-            _table = table;
-            _type = type;
+            Player = null;
+            Table = null;
+            ErrorMsg = null;
+            Type = EventType.InvalidCommand;
+        }
+        
+        public Event(string errorMsg)
+        {
+            ErrorMsg = errorMsg;
+            Type = EventType.InvalidCommand;
         }
 
-        public void SetTable(Table table)
+        public Event(EventType type, Player player = null, Table table = null)
         {
-            _table = table;
+            Type = type;
+            Player = player;
+            Table = table;
+            ErrorMsg = null;
         }
-
-        public Table GetTable()
-        {
-            return _table;
-        }
-
-        public void SetPlayer(Player player)
-        {
-            _player = player;
-        }
-
-        public Player GetPlayer()
-        {
-            return _player;
-        }
-
-        public void SetType(EventType type)
-        {
-            _type = type;
-        }
-
-        public EventType GetEventType()
-        {
-            return _type;
-        }
+        
+        [ProtoMember(1)]
+        private Player Player { get; set; }
+        [ProtoMember(2)]
+        public EventType Type { get; set; }
+        [ProtoMember(3)]
+        public string ErrorMsg { get; set; }
+        [ProtoMember(4)]
+        private Table Table { get; set; }
+        
     }
 }

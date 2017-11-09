@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using ProtoBuf;
 
 namespace Common
 {
+    [ProtoContract]
     public class StackCard
     {
+        [ProtoMember(1)]
         private List<Card> _stack;
 
         public StackCard()
@@ -30,6 +33,11 @@ namespace Common
             
             // Send the random card
             return (_stack.ToArray()[idxRandom]);
+        }
+
+        public Card GetTop()
+        {
+            return _stack.GetRange(1, 1)[0];
         }
         
         public Card PopRandomCard()

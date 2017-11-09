@@ -1,4 +1,7 @@
-﻿namespace Common
+﻿using System;
+using ProtoBuf;
+
+namespace Common
 {
     /* Enumeration definitions */
     public enum CardColor
@@ -33,10 +36,13 @@
     }
     
     /* Class Card */
+    [ProtoContract]
     public class Card
     {
         /* Attributs */
+        [ProtoMember(1)]
         private CardColor _color;
+        [ProtoMember(2)]
         private CardValue _value;
 
         public Card(CardColor color, CardValue value)

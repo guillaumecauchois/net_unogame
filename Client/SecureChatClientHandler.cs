@@ -1,4 +1,4 @@
-﻿namespace SecureChat.Client
+﻿namespace Client
 {
     using System;
     using DotNetty.Transport.Channels;

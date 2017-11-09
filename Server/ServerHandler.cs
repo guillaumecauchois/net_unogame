@@ -1,20 +1,26 @@
-﻿namespace Server
+﻿using System.IO;
+using Common;
+using ProtoBuf;
+
+namespace Server
 {
     using System;
-    using System.Net;
     using DotNetty.Transport.Channels;
     using DotNetty.Transport.Channels.Groups;
-
+    
     public class ServerHandler : SimpleChannelInboundHandler<string>
     {
         static volatile IChannelGroup group;
+        private GameCore GameCore;
+
+        public ServerHandler(GameCore gameCore) : base()
+        {
+            GameCore = gameCore;
+        }
         
-        /**
-         * Handle the connection
-         */
         public override void ChannelActive(IChannelHandlerContext contex)
         {
-            IChannelGroup g = group;
+            var g = group;
             
             if (g == null)
             {
@@ -26,12 +32,19 @@
                     }
                 }
             }
-
-            contex.WriteAndFlushAsync(string.Format("Welcome to UNO server!\n", Dns.GetHostName()));
+            var p = new Player(contex);
             g.Add(contex.Channel);
+            try
+            {
+                GameCore.Table.AddPlayer(p);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
-        class EveryOneBut : IChannelMatcher
+        private class EveryOneBut : IChannelMatcher
         {
             readonly IChannelId id;
 
@@ -45,10 +58,8 @@
 
         protected override void ChannelRead0(IChannelHandlerContext contex, string msg)
         {
-            string broadcast    = string.Format("[{0}] {1}\n", contex.Channel.RemoteAddress, msg);
-            string response     = string.Format("[you] {0}\n", msg);
-            group.WriteAndFlushAsync(broadcast, new EveryOneBut(contex.Channel.Id));
-            contex.WriteAndFlushAsync(response);
+            //   group.WriteAndFlushAsync(broadcast, new EveryOneBut(contex.Channel.Id));
+            // contex.WriteAndFlushAsync(response);
         }
 
         public override void ChannelReadComplete(IChannelHandlerContext ctx) => ctx.Flush();

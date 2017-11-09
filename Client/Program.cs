@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SecureChat.Client
+namespace Client
 {
     using System;
     using System.IO;
@@ -12,6 +12,7 @@ namespace SecureChat.Client
     using DotNetty.Transport.Bootstrapping;
     using DotNetty.Transport.Channels;
     using DotNetty.Transport.Channels.Sockets;
+    
     class Program
     {
         static async Task RunClientAsync()

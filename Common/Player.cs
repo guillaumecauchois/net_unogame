@@ -1,38 +1,30 @@
-﻿namespace Common
+﻿using System;
+using DotNetty.Transport.Channels;
+using ProtoBuf;
+
+namespace Common
 {
+    [ProtoContract]
     public class Player
     {
-        private static int      _idGenerator = 0;
-        private readonly int    _id;
-        private string          _name;
-        private Hand            _hand;
-
-        public Player(string name)
+        public Player(IChannelHandlerContext context)
         {
-            this._id = _idGenerator;
-            this._name = name;
-            this._hand = new Hand();
+            this.Id = _idGenerator;
+            this.Hand = new Hand();
+            this.Context = context;
             _idGenerator++;
+            Console.Write("\n[{0}] Join the game\n$> ", this.Id);
         }
 
-        public void SetName(string name)
-        {
-            this._name = name;
-        }
-
-        public string GetName()
-        {
-            return (this._name);
-        }
-
-        public int GetId()
-        {
-            return (this._id);
-        }
-
-        public Hand GetHand()
-        {
-            return (this._hand);
-        }
+        /* Serialized Prop */
+        [ProtoMember(1)]
+        private static int _idGenerator = 0;
+        [ProtoMember(2)]
+        public int Id { get; set; }
+        [ProtoMember(3)]
+        public Hand Hand { get; set; }
+        
+        /* Non-Serialize Prop */
+        public IChannelHandlerContext Context { get; set; }
     }
 }
