@@ -9,10 +9,12 @@ namespace Client
         private delegate void ClientEventHandlerCmd();
         private readonly ClientEventHandlerCmd[] _events;
         private CardBeautifuler _beautifuler;
+        public Event Event { get; set; }
 
         public ClientEventHandler()
         {
             Event = null;
+            _beautifuler = new CardBeautifuler();
             var _events = new Dictionary<EventType, ClientEventHandlerCmd>
             {
                 {EventType.YourTurn, HandleEventYourTurn},
@@ -21,10 +23,8 @@ namespace Client
                 {EventType.PlayerHasPlayed, HandleEventPlayerHasPlayed},
                 {EventType.InvalidCommand, HandleEventInvalidCommand}
             };
-
         }
         
-        public Event Event { get; set; }
 
         public void HandleEvent(Event eventReceived)
         {
@@ -32,7 +32,7 @@ namespace Client
             Console.WriteLine("TableType : {0} - HasDraw : {1} - pId : {2}", eventReceived.Table.Status, eventReceived.HasDraw, eventReceived.Player.Id);
             try
             {
-                _events[(int)eventReceived.Type].Invoke();
+                _events[(int) eventReceived.Type].Invoke();
             }
             catch (Exception e)
             {
