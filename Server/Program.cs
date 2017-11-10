@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using Common;
-
-namespace Server
+﻿namespace Server
 {
     using System;
     using System.Threading.Tasks;
@@ -65,7 +61,7 @@ namespace Server
             {
                 port = int.Parse(args[0]);
             }
-            catch (FormatException e)
+            catch (FormatException)
             {
                 Console.Error.WriteLine("ERROR: Invalid port provided.");
                 return (1);

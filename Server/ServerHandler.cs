@@ -1,19 +1,15 @@
-﻿using System.IO;
-using System.Runtime.Remoting.Contexts;
-using Common;
-using ProtoBuf;
+﻿using Common;
 
 namespace Server
 {
     using System;
     using DotNetty.Transport.Channels;
-    using DotNetty.Transport.Channels.Groups;
     
     public class ServerHandler : SimpleChannelInboundHandler<string>
     {
         private GameCore                _gameCore;
 
-        public ServerHandler(GameCore gameCore) : base()
+        public ServerHandler(GameCore gameCore)
         {
             _gameCore = gameCore;
         }
@@ -32,18 +28,18 @@ namespace Server
             }
         }
 
-        /* public override void HandlerRemoved(IChannelHandlerContext context)
+        public override void HandlerRemoved(IChannelHandlerContext context)
         {
-            base.HandlerRemoved(context);
             try
             {
-                _gameCore.Table.RemovePlayer();
+                var playerHasGone = _gameCore.Table.GetPlayerByContext(context);
+                _gameCore.Table.RemovePlayer(playerHasGone);
             }
             catch (Exception e)
             {
-                Console.WriteLine();
+                Console.Error.Write("[ERR] {0}\n$>", e.Message);
             }
-        } */
+        }
 
         protected override void ChannelRead0(IChannelHandlerContext contex, string msg)
         {
@@ -54,7 +50,7 @@ namespace Server
 
         public override void ExceptionCaught(IChannelHandlerContext ctx, Exception e)
         {
-            Console.Error.WriteLine(e.StackTrace);
+            // Console.Error.WriteLine(e.StackTrace);
             ctx.CloseAsync();
         }
 

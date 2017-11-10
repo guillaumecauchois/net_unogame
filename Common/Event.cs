@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using ProtoBuf;
+﻿using ProtoBuf;
 
 namespace Common
 {
     public enum EventType
     {
-        InvalidCommand = 0,
+        Error = 0,
+        StartGame,
         YourTurn,
         PlayerTurn,
         PlayerHasPlayed,
@@ -23,13 +21,13 @@ namespace Common
             Table = null;
             ErrorMsg = null;
             HasDraw = false;
-            Type = EventType.InvalidCommand;
+            Type = EventType.Error;
         }
         
         public Event(string errorMsg)
         {
             ErrorMsg = errorMsg;
-            Type = EventType.InvalidCommand;
+            Type = EventType.Error;
         }
 
         public Event(EventType type, Player player = null, Table table = null)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using DotNetty.Transport.Channels;
 using ProtoBuf;
 
@@ -10,25 +9,25 @@ namespace Common
     {
         public Player()
         {
-            this.Id = _idGenerator;
-            this.Hand = new Hand();
-            this.Context = null;
+            Id = _idGenerator;
+            Hand = new Hand();
+            Context = null;
             _idGenerator++;
-            Console.Write("\n[{0}] Join the game\n$> ", this.Id);
+            Console.Write("\n[{0}] Join the game\n$> ", Id);
         }
         
         public Player(IChannelHandlerContext context)
         {
-            this.Id = _idGenerator;
-            this.Hand = new Hand();
-            this.Context = context;
+            Id = _idGenerator;
+            Hand = new Hand();
+            Context = context;
             _idGenerator++;
-            Console.Write("\n[{0}] Join the game\n$> ", this.Id);
+            Console.Write("\n[{0}] Join the game\n$> ", Id);
         }
 
         /* Serialized Prop */
         [ProtoMember(1)]
-        private static int _idGenerator = 0;
+        private static int _idGenerator;
         [ProtoMember(2)]
         public int Id { get; set; }
         [ProtoMember(3)]
@@ -39,7 +38,7 @@ namespace Common
 
         public override string ToString()
         {
-            return $"{Id}\t *HandSize = {Hand.cards.Count} ";
+            return $"{Id}\t *HandSize = {Hand.Cards.Count} ";
         }
     }
 }

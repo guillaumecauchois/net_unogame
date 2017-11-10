@@ -6,10 +6,10 @@
         {
             
         }
-        
-        public override void HandleUse()
+
+        public override void HandleUse(Player player)
         {
-            
+            base.HandleUse(player);
         }
     }
 }

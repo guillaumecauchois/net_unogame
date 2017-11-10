@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ProtoBuf;
 
 namespace Common
@@ -7,26 +8,45 @@ namespace Common
     [ProtoContract]
     public class Hand
     {
-        [ProtoMember(1)] public List<Card> cards;
+        [ProtoMember(1)] public List<Card> Cards;
 
         public Hand()
         {
-            cards = new List<Card>();   
+            Cards = new List<Card>();
         }
 
         public void AddCard(Card card)
         {
-            cards.Add(card);
+            Cards.Add(card);
+        }
+
+        public void PopCard(Card card)
+        {
+            Cards.Remove(card);
         }
         
         public bool PutCardOnTable(Table table, Card card)
-        {
-            card.HandleUse();
-            if (!this.cards.Contains(card))
-                return (false);
-            this.cards.Remove(card);
-            table.AddCard(card);
-            return (true);
+        {   
+            try
+            {
+                var player = table.Players.Find(x => x.Hand == this);
+                card.HandleUse(player);
+                if (!Cards.Contains(card))
+                    return (false);
+                Cards.Remove(card);
+                table.AddCard(card);
+                if (Cards.Count == 0)
+                {
+                    table.SetGameEnd(player);
+                }
+                table.CurrentPlayer = table.GetNextPlayer();
+            }
+            catch (Exception)
+            {
+                if (Cards.Count == 0)
+                    table.SetGameEnd(null);
+            }
+            return true;
         }
 
         public void DisplayHand(CardBeautifuler beautifuler)
@@ -34,9 +54,9 @@ namespace Common
             Console.WriteLine("Your cards :");
 
             var index = 0;
-            foreach (var card in cards)
+            foreach (var card in Cards)
             {
-                Console.WriteLine(index + " : " + beautifuler.GetStringCard(card));
+                Console.WriteLine(index + " : " + CardBeautifuler.GetStringCard(card));
                 index++;
             }
         }
