@@ -58,10 +58,11 @@ namespace Common
             Color = color;
             Value = value;
         }
-        
-        public virtual void HandleUse()
+
+        public virtual void HandleUse(Player player)
         {
-            
+            Console.WriteLine("[OK] Player {0} put on table a {1} card",
+                player.Id, CardBeautifuler.GetStringCard(this));
         }
     }
 }

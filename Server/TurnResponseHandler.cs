@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Common;
 
 namespace Server
@@ -8,12 +7,12 @@ namespace Server
     {
         private static bool CheckCardPossession(Player player, Card card)
         {
-            return (true);
+            return player.Hand.Cards.Contains(card);
         }
 
         private static bool CheckPlayerTurn(Player player, Table table)
         {
-            return (true);
+            return (table.CurrentPlayer == player);
         }
 
         private static bool CheckGameIsRunning(Table table)
@@ -24,9 +23,10 @@ namespace Server
         public static int Handle(TurnResponse response, Player player, Table table)
         {
             if (!CheckCardPossession(player, response.Card) ||
-                !CheckPlayerTurn(player, table))
+                !CheckPlayerTurn(player, table) ||
+                !CheckGameIsRunning(table))
                 return (-1);
-            Console.WriteLine("{0} {1}", response.Card.Color, response.Card.Value);
+            table.PutCardOnTable(player, response.Card);
             return (0);
         }
     }

@@ -21,7 +21,7 @@ namespace Client
                 {EventType.PlayerTurn, HandleEventPlayerTurn},
                 {EventType.EndGame, HandleEventEndGame},
                 {EventType.PlayerHasPlayed, HandleEventPlayerHasPlayed},
-                {EventType.InvalidCommand, HandleEventInvalidCommand}
+                {EventType.Error, HandleEventInvalidCommand}
             };
         }
         

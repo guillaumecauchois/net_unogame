@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using DotNetty.Transport.Channels;
 using ProtoBuf;
@@ -19,7 +18,7 @@ namespace Common
     {
         [ProtoMember(1, IsRequired = true)] private StackCard  History;
         [ProtoMember(2, IsRequired = true)] private StackCard  StackCard;
-        [ProtoMember(3)] public GameStatus                     Status = GameStatus.NotStarted;
+        [ProtoMember(3)] public GameStatus                     Status;
         [ProtoMember(4)] private Player                        Winner { get; set; }
         [ProtoMember(6)] public Player                         CurrentPlayer { set; get; }
         [ProtoMember(5)] public List<Player>                   Players;
@@ -51,18 +50,39 @@ namespace Common
                 throw new Exception("Sorry but the game is already started ...");
         }
 
-        /*
-        private Player GetNextPlayer()
+        public Player GetNextPlayer()
         {
-           Players.Find()
+            return Players.Find(x => x == CurrentPlayer);
         }
-        */
+
+        public bool IsValidGame()
+        {
+            return (Players.Count >= 2);
+        }
         
         public void RemovePlayer(Player player)
         {
-            if (CurrentPlayer == player)
-                
+            foreach (var card in player.Hand.Cards)
+            {
+                player.Hand.PopCard(card);
+                StackCard.AddCard(card);
+            }
+            Console.WriteLine("\n[INFO] The player {0} left the game.", player.Id);
+            Console.Write("$> ");
             Players.Remove(player);
+            if (CurrentPlayer == player)
+            {
+                try
+                {
+                    CurrentPlayer = GetNextPlayer();
+                }
+                catch (ArgumentNullException)
+                {
+                    SetGameEnd(null);                    
+                }
+            }
+            if (!IsValidGame())
+                SetGameEnd(null);
         }
         
         public void StartGame()

@@ -6,14 +6,14 @@ namespace Server
 {
     public static class ServerCommand
     {
-        public static int ExectureCommand(string commandName,  Table table, GameCore core)
+        public static int ExecuteCommand(string commandName,  Table table, GameCore core)
         {
             var dictionary =
                 new Dictionary<string, Func<Table, GameCore, int>>
                 {
                     {"start", ServerCommandStart},
                     {"reset", ServerCommandReset},
-                    {"list players", ServerCommandListPlayers}
+                    {"list players", ServerCommandListPlayers},
                 };
 
             if (dictionary.ContainsKey(commandName))
@@ -66,7 +66,7 @@ namespace Server
             }
             foreach (var player in listPlayers)
             {
-                Console.WriteLine("{0}", player.ToString());
+                Console.WriteLine("{0}", player);
             }
             return (0);
         }
