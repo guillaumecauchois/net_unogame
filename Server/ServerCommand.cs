@@ -35,7 +35,10 @@ namespace Server
         private static int ServerCommandStart(Table table, GameCore core)
         {
             if (table.Status.Equals(GameStatus.NotStarted))
+            {
                 core.LaunchNewGame();
+                Console.WriteLine("[OK] Game started");
+            }
             else
                 Console.Error.WriteLine("[ERR] Sorry, the game is still running");
             return 0;

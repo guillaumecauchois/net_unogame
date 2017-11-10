@@ -10,21 +10,22 @@ namespace Client
         private delegate void ClientEventHandlerCmd();
         private ClientEventHandlerCmd[] _events;
         private CardBeautifuler _beautifuler;
+        public Event Event { get; set; }
 
         public ClientEventHandler()
         {
             Event = null;
-            /*var _events = new Dictionary<int, ClientEventHandlerCmd>();
+            _beautifuler = new CardBeautifuler();
+            var _events = new Dictionary<EventType, ClientEventHandlerCmd>
             {
-                {(int)EventType.YourTurn, HandleEventYourTurn},
-                {(int)EventType.PlayerTurn, HandleEventPlayerTurn},
-                {(int)EventType.EndGame, HandleEventEndGame},
-                {(int)EventType.PlayerHasPlayed, HandleEventPlayerHasPlayed},
-                {(int)EventType.InvalidCommand, HandleEventInvalidCommand}
-            };*/
+                {EventType.YourTurn, HandleEventYourTurn},
+                {EventType.PlayerTurn, HandleEventPlayerTurn},
+                {EventType.EndGame, HandleEventEndGame},
+                {EventType.PlayerHasPlayed, HandleEventPlayerHasPlayed},
+                {EventType.InvalidCommand, HandleEventInvalidCommand}
+            };
         }
         
-        public Event Event { get; set; }
 
         public void HandleEvent(Event eventReceived)
         {
