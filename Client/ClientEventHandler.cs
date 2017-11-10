@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using Common;
+using NUnit.Framework.Internal;
 
 namespace Client
 {
     public class ClientEventHandler
     {
         private delegate void ClientEventHandlerCmd();
-        private readonly ClientEventHandlerCmd[] _events;
+        private ClientEventHandlerCmd[] _events;
         private CardBeautifuler _beautifuler;
 
         public ClientEventHandler()
         {
             Event = null;
-            var _events = new Dictionary<EventType, ClientEventHandlerCmd>
+            /*var _events = new Dictionary<int, ClientEventHandlerCmd>();
             {
-                {EventType.YourTurn, HandleEventYourTurn},
-                {EventType.PlayerTurn, HandleEventPlayerTurn},
-                {EventType.EndGame, HandleEventEndGame},
-                {EventType.PlayerHasPlayed, HandleEventPlayerHasPlayed},
-                {EventType.InvalidCommand, HandleEventInvalidCommand}
-            };
-
+                {(int)EventType.YourTurn, HandleEventYourTurn},
+                {(int)EventType.PlayerTurn, HandleEventPlayerTurn},
+                {(int)EventType.EndGame, HandleEventEndGame},
+                {(int)EventType.PlayerHasPlayed, HandleEventPlayerHasPlayed},
+                {(int)EventType.InvalidCommand, HandleEventInvalidCommand}
+            };*/
         }
         
         public Event Event { get; set; }
@@ -29,15 +29,30 @@ namespace Client
         public void HandleEvent(Event eventReceived)
         {
             Event = eventReceived;
-            Console.WriteLine("TableType : {0} - HasDraw : {1} - pId : {2}", eventReceived.Table.Status, eventReceived.HasDraw, eventReceived.Player.Id);
-            try
+            if (Event.Type == EventType.YourTurn)
             {
-                _events[(int)eventReceived.Type].Invoke();
+                HandleEventYourTurn();
+            }
+            else if (Event.Type == EventType.PlayerTurn)
+            {
+                HandleEventPlayerTurn();
+            }
+            else if (Event.Type == EventType.PlayerHasPlayed)
+            {
+                HandleEventPlayerHasPlayed();
+            }
+            else if (Event.Type == EventType.EndGame)
+            {
+                HandleEventEndGame();
+            }
+            /*try
+            {
+                _events[(int)Event.Type].Invoke();
             }
             catch (Exception e)
             {
-                Console.Error.Write("[ERR] Receive invalid Event Type : " + eventReceived.Type);
-            }
+                Console.Error.Write("[ERR] Receive invalid Event Type : " + Event.Type);
+            }*/
         }
 
         private void HandleEventInvalidCommand()
