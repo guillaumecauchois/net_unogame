@@ -59,12 +59,12 @@ namespace Client
                 return;
             }
             int cardIndex = int.Parse(args[1]);
-            if (!(cardIndex >= 0 && cardIndex < handler.Event.Player.Hand.cards.Count))
+            if (!(cardIndex >= 0 && cardIndex < handler.Event.Player.Hand.Cards.Count))
             {
                 Console.WriteLine("Incorrect index");
                 return;
             }
-            var card = handler.Event.Player.Hand.cards[cardIndex];
+            var card = handler.Event.Player.Hand.Cards[cardIndex];
             var LastCard = handler.Event.Table.GetTopStackCard();
             if (card.Color == LastCard.Color || card.Value == LastCard.Value)
             {
