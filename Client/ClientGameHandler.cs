@@ -55,7 +55,7 @@ namespace Client
             if (handler.Event.Player.Hand.Cards.Count == 2)
             {
                 Console.WriteLine("200 UNO_OK");
-                TurnResponse response = new TurnResponse(null, true);
+                TurnResponse response = new TurnResponse(null, true, TurnResponse.TurnType.Uno);
                 return (response);
                 // TODO : Je pense qu'il faut que le joueur fasse un UNO AVANT de jouer sa carte
             }
@@ -91,8 +91,8 @@ namespace Client
                 return null;
             }
             Console.WriteLine("200 PLAY_OK");
-            TurnResponse response = new TurnResponse(handler.Event.Player.Hand.Cards[cardIndex], false);
-            return (response);
+            TurnResponse response = new TurnResponse(handler.Event.Player.Hand.Cards[cardIndex], false, TurnResponse.TurnType.Play);
+            return response;
         }
 
         private TurnResponse HandlePassCmd(ClientEventHandler handler, string[] args)
@@ -120,8 +120,8 @@ namespace Client
             else
             {
                 Console.WriteLine("200 PASS_OK");
-                // TODO : Envoyer une requête PASS au serveur
-                return null;
+                TurnResponse response = new TurnResponse(null, false, TurnResponse.TurnType.Pass);
+                return response;
             }
         }
 
@@ -172,8 +172,8 @@ namespace Client
             }
             else
             {
-                // TODO : Envoyer au serveur une requête de pioche
-                return null;
+                TurnResponse response = new TurnResponse(null, false, TurnResponse.TurnType.Draw);
+                return response;
             }
         }
         

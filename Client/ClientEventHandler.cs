@@ -70,7 +70,8 @@ namespace Client
 
         private void HandleEventEndGame()
         {
-            Console.WriteLine("handle event end game");
+            // TODO : Ne pas oublier de set le winner à la fin de la partie
+            //Console.WriteLine("End of the game ! Winner is player#" + Event.Table.Winner);
         }
 
         private void HandleEventPlayerTurn()
@@ -80,8 +81,7 @@ namespace Client
 
         private void HandleEventPlayerHasPlayed()
         {
-            // plus de précisions pour ce que le joueur a joué
-            Console.WriteLine("handle event has played");
+            Console.WriteLine("Player #" + Event.Player.Id + " played " + CardBeautifuler.GetStringCard(Event.Table.GetTopStackCard()));
         }
     }
 }
