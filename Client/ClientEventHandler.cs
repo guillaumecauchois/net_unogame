@@ -64,6 +64,7 @@ namespace Client
         private void HandleEventYourTurn()
         {
             Console.WriteLine("It's your turn to play !");
+            // TODO : Si il a fait un "UNO", on lui réaffiche sa main ?
             Event.Player.Hand.DisplayHand(_beautifuler);
         }
 
