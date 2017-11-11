@@ -50,9 +50,7 @@ namespace Common
         }
 
         public void DisplayHand(CardBeautifuler beautifuler)
-        {
-            Console.WriteLine("Your cards :");
-
+        {         
             var index = 0;
             foreach (var card in Cards)
             {

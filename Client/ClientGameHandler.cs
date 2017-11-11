@@ -37,25 +37,31 @@ namespace Client
 
         private TurnResponse HandleUnoCmd(ClientEventHandler handler, string[] args)
         {
-            if (handler.Event.Type != EventType.YourTurn)
-            {
-                Console.WriteLine("NOT YOUR TURN");
-                return null;
-            }
             if (args.Length != 1)
             {
-                Console.WriteLine("No arguments needed");
+                Console.WriteLine("431 ERR_NOARGUMENTSNEEDED");
+                return null;
+            }
+            if (handler.Event.Table.Status != GameStatus.Running)
+            {
+                Console.WriteLine("432 ERR_NOTGAMINGTIME");
+                return null;
+            }
+            if (handler.Event.Type != EventType.YourTurn)
+            {
+                Console.WriteLine("433 ERR_NOTYOURTURN");
                 return null;
             }
             if (handler.Event.Player.Hand.Cards.Count == 2)
             {
+                Console.WriteLine("200 UNO_OK");
                 TurnResponse response = new TurnResponse(null, true);
                 return (response);
                 // TODO : Je pense qu'il faut que le joueur fasse un UNO AVANT de jouer sa carte
             }
             else
             {
-                Console.WriteLine("You must have 2 cards left to call a Uno");
+                Console.WriteLine("434 ERR_INVALIDCARDSNB");
                 return null;
             }
         }
@@ -63,45 +69,57 @@ namespace Client
         private TurnResponse HandlePlayCmd(ClientEventHandler handler, string[] args)
         {
             Console.WriteLine("handle PLAY cmd");
+            if (handler.Event.Table.Status != GameStatus.Running)
+            {
+                Console.WriteLine("421 ERR_NOTGAMINGTIME");
+                return null;
+            }
             if (handler.Event.Type != EventType.YourTurn)
             {
-                Console.WriteLine("NOT YOUR TURN");
+                Console.WriteLine("422 ERR_NOTYOURTURN");
                 return null;
             }
             if (args.Length != 2)
             {
-                Console.WriteLine("You need to pick one card");
-                return null;
+                Console.WriteLine("423 ERR_INCOMPLETEARGUMENTS");
+                return null;      
             }
             int cardIndex = int.Parse(args[1]);
             if (!(cardIndex >= 0 && cardIndex < handler.Event.Player.Hand.Cards.Count))
             {
-                Console.WriteLine("Incorrect index");
+                Console.WriteLine("424 ERR_BADINDEX");
                 return null;
             }
+            Console.WriteLine("200 PLAY_OK");
             TurnResponse response = new TurnResponse(handler.Event.Player.Hand.Cards[cardIndex], false);
             return (response);
         }
 
         private TurnResponse HandlePassCmd(ClientEventHandler handler, string[] args)
         {
-            if (handler.Event.Type != EventType.YourTurn)
-            {
-                Console.WriteLine("NOT YOUR TURN");
-                return null;
-            }
             if (args.Length != 1)
             {
-                Console.WriteLine("No arguments needed");
+                Console.WriteLine("451 ERR_NOARGUMENTSNEEDED");
+                return null;
+            }
+            if (handler.Event.Table.Status != GameStatus.Running)
+            {
+                Console.WriteLine("452 ERR_NOTGAMINGTIME");
+                return null;
+            }
+            if (handler.Event.Type != EventType.YourTurn)
+            {
+                Console.WriteLine("453 ERR_NOTYOURTURN");
                 return null;
             }
             if (!handler.Event.HasDraw)
             {
-                Console.WriteLine("You must play or draw");
+                Console.WriteLine("454 ERR_MUSTPLAYORDRAW");
                 return null;
             }
             else
             {
+                Console.WriteLine("200 PASS_OK");
                 // TODO : Envoyer une requête PASS au serveur
                 return null;
             }
@@ -111,14 +129,19 @@ namespace Client
         {
             if (args.Length != 1)
             {
-                Console.WriteLine("No arguments needed");
+                Console.WriteLine("411 ERR_NOARGUMENTSNEEDED");
             }
             if (handler.Event.Table.Status != GameStatus.Running)
             {
-                Console.WriteLine("There is no game running");
+                Console.WriteLine("412 ERR_NOTGAMINGTIME");
+            }
+            if (handler.Event.Player.Hand.Cards.Count == 0)
+            {
+                Console.WriteLine("413 ERR_EMPTYHAND");
             }
             else
             {
+                Console.WriteLine("200 HAND_OK:");
                 handler.Event.Player.Hand.DisplayHand(beautiful);
             }
             return null;
@@ -127,19 +150,24 @@ namespace Client
         private TurnResponse HandleDrawCmd(ClientEventHandler handler, string[] args)
         {
             Console.WriteLine("handle DRAW cmd");
-            if (handler.Event.Type != EventType.YourTurn)
-            {
-                Console.WriteLine("NOT YOUR TURN");
-                return null;
-            }
             if (args.Length != 1)
             {
-                Console.WriteLine("No arguments needed");
+                Console.WriteLine("461 ERR_NOARGUMENTSNEEDED");
+                return null;
+            }
+            if (handler.Event.Table.Status != GameStatus.Running)
+            {
+                Console.WriteLine("462 ERR_NOTGAMINGTIME");
+                return null;
+            }
+            if (handler.Event.Type != EventType.YourTurn)
+            {
+                Console.WriteLine("463 ERR_NOTYOURTURN");
                 return null;
             }
             if (handler.Event.HasDraw)
             {
-                Console.WriteLine("You can't draw another card");
+                Console.WriteLine("464 ERR_ALREADYDRAW");
                 return null;
             }
             else
