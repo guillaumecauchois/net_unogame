@@ -17,9 +17,9 @@ namespace Client
     {
         
         public static ClientGameHandler GameHandler = new ClientGameHandler();
-        public static ClientHandler saucisse = new ClientHandler();
+        public static ClientHandler handler = new ClientHandler();
         
-        static async Task RunClientAsync()
+        static async Task RunClientAsync(string ip, int port)
         {
   
             var group = new MultithreadEventLoopGroup();
@@ -38,15 +38,15 @@ namespace Client
                         IChannelPipeline pipeline = channel.Pipeline;
 
                         pipeline.AddLast(new DelimiterBasedFrameDecoder(8192, Delimiters.LineDelimiter()));
-                        pipeline.AddLast(new StringEncoder(), new StringDecoder(), saucisse);
+                        pipeline.AddLast(new StringEncoder(), new StringDecoder(), handler);
                     }));
 
-                IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4242));
+                IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(ip), port));
 
                 for (;;)
                 {
                     Console.Write("$> ");
-                    string line = Console.ReadLine();
+                    var line = Console.ReadLine();
                     if (string.IsNullOrEmpty(line))
                     {
                         continue;
@@ -54,7 +54,7 @@ namespace Client
 
                     try
                     {
-                        TurnResponse response = GameHandler.HandleClientCmd(saucisse.GetEventHandler(), line);
+                        var response = GameHandler.HandleClientCmd(handler.GetEventHandler(), line);
                         if (response != null)
                         {
                             var serObj = SerializeHandler.SerializeObj(response);
@@ -82,9 +82,37 @@ namespace Client
             }
         }
 
-        static void Main()
+        static int Main(string[] args)
         {
-            RunClientAsync().Wait();
+            int port;
+            string ip;
+
+            if (args.Length != 2)
+            {
+                Console.Error.WriteLine("ERROR: You need provide a port for the connection.");
+                return (1);
+            }
+            try
+            {
+                port = int.Parse(args[1]);
+                ip = args[0];
+            }
+            catch (FormatException)
+            {
+                Console.Error.WriteLine("ERROR: Invalid port provided.");
+                return (1);
+            }
+            Console.WriteLine("|******| UNO - SERVER - C# .NET Project |*****|");
+            Console.WriteLine("Contributors: Guillaume CAUCHOIS & Pierre STASZAK");
+            try
+            {
+                RunClientAsync(ip, port).Wait();
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
+            return (0);
         }
     }
 }

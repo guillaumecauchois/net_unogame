@@ -37,9 +37,9 @@ namespace Common
             return (_stack.ToArray()[idxRandom]);
         }
 
-        public Card GetTop()
+        public Card GetLastCard()
         {
-            return _stack.GetRange(1, 1)[0];
+            return _stack.FindLast(x => true);
         }
         
         public Card PopRandomCard()

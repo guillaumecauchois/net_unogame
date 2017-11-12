@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DotNetty.Transport.Channels;
 using ProtoBuf;
+using ProtoBuf.Meta;
 
 namespace Common
 {
@@ -20,14 +21,14 @@ namespace Common
         [ProtoMember(2, IsRequired = true)] private StackCard  StackCard;
         [ProtoMember(3)] public GameStatus                     Status;
         [ProtoMember(4)] private Player                        Winner { get; set; }
-        [ProtoMember(6)] public Player                         CurrentPlayer { set; get; }
         [ProtoMember(5)] public List<Player>                   Players;
+        [ProtoMember(6)] public Player                         CurrentPlayer { set; get; }
 
         public Table()
         {
+            Status = GameStatus.NotStarted;
             History = new StackCard();
             StackCard = new StackCard();
-            Status = GameStatus.NotStarted;
             Winner = null;
             Players = new List<Player>();
         }
@@ -62,14 +63,16 @@ namespace Common
         
         public void RemovePlayer(Player player)
         {
+            
             foreach (var card in player.Hand.Cards)
             {
-                player.Hand.PopCard(card);
                 StackCard.AddCard(card);
             }
+            player.Hand.Cards.RemoveAll(x => true); 
             Console.WriteLine("\n[INFO] The player {0} left the game.", player.Id);
             Console.Write("$> ");
             Players.Remove(player);
+            if (Status != GameStatus.Running) return;
             if (CurrentPlayer == player)
             {
                 try
@@ -78,7 +81,7 @@ namespace Common
                 }
                 catch (ArgumentNullException)
                 {
-                    SetGameEnd(null);                    
+                    SetGameEnd(null);
                 }
             }
             if (!IsValidGame())
@@ -92,6 +95,7 @@ namespace Common
             ResetGamePlay();
             StackCard.GenerateDeck();
             DistributeCardToPlayers();
+            History.AddCard(StackCard.PopRandomCard());
             Status = GameStatus.Running;
             CurrentPlayer = Players.First();
         }
@@ -124,7 +128,7 @@ namespace Common
 
         public Card GetTopStackCard()
         {
-            return History.GetTop();
+            return History.GetLastCard();
         }
 
         public void SendObjectToOtherPlayers<T>(T obj, Player currentPlayer)
