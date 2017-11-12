@@ -24,18 +24,18 @@ namespace Client
 
         public TurnResponse HandleClientCmd(ClientEventHandler handler, string line)
         {
-            string[] args = line.Split(' ');
+            var args = line.Split(' ');
             for (var i = 0; i < 2; i++)
             {
                 if (args[0] == _cmdsNames[i])
                 {
                     return (_cmdsFunctions[i](handler, args));
-               }
+                }
             }
             return null;
         }
 
-        private TurnResponse HandleUnoCmd(ClientEventHandler handler, string[] args)
+        private static TurnResponse HandleUnoCmd(ClientEventHandler handler, string[] args)
         {
             if (args.Length != 1)
             {
@@ -55,7 +55,7 @@ namespace Client
             if (handler.Event.Player.Hand.Cards.Count == 2)
             {
                 Console.WriteLine("200 UNO_OK");
-                TurnResponse response = new TurnResponse(null, true, TurnResponse.TurnType.Uno);
+                var response = new TurnResponse(null, true, TurnResponse.TurnType.Uno);
                 return (response);
                 // TODO : Je pense qu'il faut que le joueur fasse un UNO AVANT de jouer sa carte
             }
@@ -66,9 +66,8 @@ namespace Client
             }
         }
 
-        private TurnResponse HandlePlayCmd(ClientEventHandler handler, string[] args)
+        private static TurnResponse HandlePlayCmd(ClientEventHandler handler, string[] args)
         {
-            Console.WriteLine("handle PLAY cmd");
             if (handler.Event.Table.Status != GameStatus.Running)
             {
                 Console.WriteLine("421 ERR_NOTGAMINGTIME");
@@ -84,18 +83,18 @@ namespace Client
                 Console.WriteLine("423 ERR_INCOMPLETEARGUMENTS");
                 return null;      
             }
-            int cardIndex = int.Parse(args[1]);
+            var cardIndex = int.Parse(args[1]);
             if (!(cardIndex >= 0 && cardIndex < handler.Event.Player.Hand.Cards.Count))
             {
                 Console.WriteLine("424 ERR_BADINDEX");
                 return null;
             }
             Console.WriteLine("200 PLAY_OK");
-            TurnResponse response = new TurnResponse(handler.Event.Player.Hand.Cards[cardIndex], false, TurnResponse.TurnType.Play);
+            var response = new TurnResponse(handler.Event.Player.Hand.Cards[cardIndex], false, TurnResponse.TurnType.Play);
             return response;
         }
 
-        private TurnResponse HandlePassCmd(ClientEventHandler handler, string[] args)
+        private static TurnResponse HandlePassCmd(ClientEventHandler handler, string[] args)
         {
             if (args.Length != 1)
             {
@@ -120,7 +119,7 @@ namespace Client
             else
             {
                 Console.WriteLine("200 PASS_OK");
-                TurnResponse response = new TurnResponse(null, false, TurnResponse.TurnType.Pass);
+                var response = new TurnResponse(null, false, TurnResponse.TurnType.Pass);
                 return response;
             }
         }
@@ -147,9 +146,8 @@ namespace Client
             return null;
         }
 
-        private TurnResponse HandleDrawCmd(ClientEventHandler handler, string[] args)
+        private static TurnResponse HandleDrawCmd(ClientEventHandler handler, string[] args)
         {
-            Console.WriteLine("handle DRAW cmd");
             if (args.Length != 1)
             {
                 Console.WriteLine("461 ERR_NOARGUMENTSNEEDED");
@@ -172,7 +170,7 @@ namespace Client
             }
             else
             {
-                TurnResponse response = new TurnResponse(null, false, TurnResponse.TurnType.Draw);
+                var response = new TurnResponse(null, false, TurnResponse.TurnType.Draw);
                 return response;
             }
         }

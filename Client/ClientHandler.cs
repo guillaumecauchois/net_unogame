@@ -11,7 +11,6 @@ namespace Client
         
         protected override void ChannelRead0(IChannelHandlerContext contex, string msg)
         {
-            Console.WriteLine("on reçoit un truc !!!!");
             try
             {
                 var rEvent = SerializeHandler.DeserializeObject<Event>(msg);

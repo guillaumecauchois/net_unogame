@@ -102,6 +102,24 @@ namespace Common
         
         public void SetGameEnd(Player winner)
         {
+            foreach (var player in Players)
+            {
+                try
+                {
+                    var eventEnd = new Event(EventType.EndGame, winner, this);
+                    var serObj = SerializeHandler.SerializeObj(eventEnd);
+                    player.Context.WriteAndFlushAsync(serObj);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
+            if (winner != null)
+                Console.WriteLine("[OK] End of the game the winner is : {0}!\n$> ", winner.Id);
+            else
+                Console.WriteLine("[OK] End of the game, there is no winner\n$> ");
             Winner = winner;
             Status = GameStatus.End;
         }

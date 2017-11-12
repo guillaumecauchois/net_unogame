@@ -22,6 +22,7 @@ namespace Server
         
         public static int Handle(TurnResponse response, Player player, Table table)
         {
+            Console.WriteLine("Reception d'un turn response ! ");
             if (!CheckCardPossession(player, response.Card) ||
                 !CheckPlayerTurn(player, table) ||
                 !CheckGameIsRunning(table))

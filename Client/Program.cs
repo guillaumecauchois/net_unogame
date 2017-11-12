@@ -56,16 +56,14 @@ namespace Client
                     {
                         var response = GameHandler.HandleClientCmd(handler.GetEventHandler(), line);
                         if (response != null)
-                        {
+                        {   
                             var serObj = SerializeHandler.SerializeObj(response);
                             await bootstrapChannel.WriteAndFlushAsync(serObj + "\r\n");
                         }
-                        //Console.WriteLine(line);
-                        //await bootstrapChannel.WriteAndFlushAsync(line + "\r\n");
                     }
-                    catch
+                    catch (Exception e)
                     {
-                        // ignored
+                        Console.Error.WriteLine(e.Message);
                     }
                     if (string.Equals(line, "bye", StringComparison.OrdinalIgnoreCase))
                     {

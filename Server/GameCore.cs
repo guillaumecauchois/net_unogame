@@ -76,6 +76,7 @@ namespace Server
 
         public void HandleTurnResponse(IChannelHandlerContext context, string msg)
         {
+            Console.WriteLine($"{msg}");
             try
             {
                 var tResponse =
