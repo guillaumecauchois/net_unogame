@@ -65,6 +65,7 @@ namespace Client
         {
             Console.WriteLine("It's your turn to play !");
             // TODO : Si il a fait un "UNO", on lui réaffiche sa main ?
+            Console.WriteLine("La carte posé sur la table est : " + CardBeautifuler.GetStringCard(Event.Table.GetTopStackCard()));
             Event.Player.Hand.DisplayHand(_beautifuler);
         }
 
