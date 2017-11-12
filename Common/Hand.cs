@@ -32,14 +32,10 @@ namespace Common
                  cardToPut.Value.Equals(CardValue.ChangeColor)))
                 return true;
             if (cardTable.Color == cardToPut.Color)
-            {
                 return true;
-            }
             if (cardTable.Value == cardToPut.Value)
-            {
                 return true;
-            }
-            return false;
+            return cardTable.JokerColor == cardToPut.Color;
         }
         
         public bool PutCardOnTable(Table table, Card card)
@@ -47,11 +43,7 @@ namespace Common
             try
             {
                 var player = table.Players.Find(x => x.Hand == this);
-                if (!Cards.Exists(x => x.Value.Equals(card.Value) || x.Color.Equals(card.Color)))
-                {
-                    Console.Error.WriteLine("Ne contient pas la carte demandée");
-                    return (false);   
-                }
+                
                 if (!CardIsValidToBePut(card, table.GetTopStackCard()))
                 {
                     Console.Error.WriteLine("Invalid à la pose");

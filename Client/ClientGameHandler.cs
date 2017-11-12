@@ -73,7 +73,9 @@ namespace Client
             else
             {
                 Console.WriteLine("200 PLAY_OK");
-                return new TurnResponse(handler.Event.Player.Hand.Cards[int.Parse(args[1])], TurnResponse.TurnType.Play, color);
+                handler.Event.Player.Hand.Cards[int.Parse(args[1])].JokerColor =
+                    color;
+                return new TurnResponse(handler.Event.Player.Hand.Cards[int.Parse(args[1])], TurnResponse.TurnType.Play);
             }
         }
         
@@ -85,11 +87,9 @@ namespace Client
                 return null;      
             }
             Console.WriteLine("200 PLAY_OK");
-            return new TurnResponse(handler.Event.Player.Hand.Cards[int.Parse(args[1])], TurnResponse.TurnType.Play, CardColor.Undefined);
+            return new TurnResponse(handler.Event.Player.Hand.Cards[int.Parse(args[1])], TurnResponse.TurnType.Play);
             
         }
-        
-        
 
         private TurnResponse HandlePlayCmd(ClientEventHandler handler, string[] args)
         {
@@ -114,7 +114,7 @@ namespace Client
                 Console.WriteLine("424 ERR_BADINDEX");
                 return null;
             }
-            CardValue value = handler.Event.Player.Hand.Cards[cardIndex].Value;
+            var value = handler.Event.Player.Hand.Cards[cardIndex].Value;
             if (value == CardValue.ChangeColor || value == CardValue.Plus4)
             {
                 return PlayJokerCard(handler, args);
@@ -145,7 +145,7 @@ namespace Client
             else
             {
                 Console.WriteLine("200 PASS_OK");
-                return new TurnResponse(null, TurnResponse.TurnType.Pass, CardColor.Undefined);
+                return new TurnResponse(null, TurnResponse.TurnType.Pass);
             }
         }
         
@@ -167,7 +167,7 @@ namespace Client
                 return null;
             }
             Console.WriteLine("200 UNO_OK");
-            return new TurnResponse(null, TurnResponse.TurnType.Uno, CardColor.Undefined);
+            return new TurnResponse(null, TurnResponse.TurnType.Uno);
         }
 
         private static TurnResponse HandleDrawCmd(ClientEventHandler handler, string[] args)
@@ -188,7 +188,7 @@ namespace Client
                 return null;
             }
             Console.WriteLine("200 DRAW_OK:");
-            return new TurnResponse(null, TurnResponse.TurnType.Draw, CardColor.Undefined);
+            return new TurnResponse(null, TurnResponse.TurnType.Draw);
         }
         
     }
