@@ -13,7 +13,7 @@ namespace Client
         
         public ClientGameHandler()
         {       
-            _cmdsFunctions = new ClientCmdHandler[4];
+            _cmdsFunctions = new ClientCmdHandler[5];
             _cmdsFunctions[0] = HandlePlayCmd;
             _cmdsFunctions[1] = HandleDrawCmd;
             _cmdsFunctions[2] = HandleUnoCmd;
