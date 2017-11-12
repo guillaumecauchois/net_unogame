@@ -24,15 +24,30 @@ namespace Common
         {
             Cards.Remove(card);
         }
+
+        public bool CardIsValidToPut(Card cardToPut, Card cardTable)
+        {
+            if (cardTable.Color == cardToPut.Color)
+            {
+                return true;
+            }
+            else if (cardTable.Value == cardToPut.Value)
+            {
+                return true;
+            }
+            return false;
+        }
         
         public bool PutCardOnTable(Table table, Card card)
         {   
             try
             {
                 var player = table.Players.Find(x => x.Hand == this);
-                card.HandleUse(player);
                 if (!Cards.Contains(card))
                     return (false);
+                if (!CardIsValidToPut(card, table.GetTopStackCard()))
+                    return (false);
+                card.HandleUse(player);
                 Cards.Remove(card);
                 table.AddCard(card);
                 if (Cards.Count == 0)

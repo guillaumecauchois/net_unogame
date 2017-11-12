@@ -40,7 +40,7 @@ namespace Client
                         pipeline.AddLast(new StringEncoder(), new StringDecoder(), saucisse);
                     }));
 
-                IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse("10.26.112.222"), 4242));
+                IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 4242));
 
                 for (;;)
                 {

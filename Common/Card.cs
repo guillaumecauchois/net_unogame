@@ -6,7 +6,7 @@ namespace Common
     /* Enumeration definitions */
     public enum CardColor
     {
-        MinDefinedColor = 0,
+        MinDefinedColor = Green,
         Undefined = 0,
         Green,
         Red,
@@ -34,7 +34,7 @@ namespace Common
         PassTurn,
         ChangeColor,
         Plus4,
-        MaxDefinedValue = Plus4,
+        MaxDefinedValue = PassTurn,
     }
     
     /* Class Card */

@@ -34,6 +34,9 @@ namespace Server
             {
                 var playerHasGone = _gameCore.Table.GetPlayerByContext(context);
                 _gameCore.Table.RemovePlayer(playerHasGone);
+
+                
+
             }
             catch (Exception e)
             {

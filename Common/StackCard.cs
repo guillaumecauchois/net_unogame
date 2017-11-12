@@ -25,11 +25,13 @@ namespace Common
             // Get Stack Lenght
             var lenght = _stack.Count;
             if (lenght == 0)
-                throw new Exception("StackCard is empty");
+            {
+                // TODO: Guillaume - Passer les vieilles cartes de _history dans _stackCard
+            }
 
             // Generate the index of the random card
             var random = new Random();
-            var idxRandom = random.Next(0, lenght + 1);
+            var idxRandom = Randomizer.GetRandomNumber(0, lenght);
             
             // Send the random card
             return (_stack.ToArray()[idxRandom]);
@@ -42,7 +44,7 @@ namespace Common
         
         public Card PopRandomCard()
         {
-            Card card = GetRandomCard();
+            var card = GetRandomCard();
 
             _stack.Remove(card);
             return (card);
