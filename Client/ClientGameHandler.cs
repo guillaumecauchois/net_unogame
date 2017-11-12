@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Remoting.Contexts;
 using Common;
 
@@ -12,58 +13,31 @@ namespace Client
         private string[] _cmdsNames;
         
         public ClientGameHandler()
-        {       
-            _cmdsFunctions = new ClientCmdHandler[5];
-            _cmdsFunctions[0] = HandlePlayCmd;
-            _cmdsFunctions[1] = HandleDrawCmd;
-            _cmdsFunctions[2] = HandleUnoCmd;
-            _cmdsFunctions[3] = HandlePassCmd;
-            _cmdsFunctions[4] = HandleHandCmd;
-            _cmdsNames = new[] {"Play", "Draw", "Uno", "Pass", "Hand"};
+        {
             beautiful = new CardBeautifuler();
         }
 
         public TurnResponse HandleClientCmd(ClientEventHandler handler, string line)
         {
-            var args = line.Split(' ');
-            for (var i = 0; i < 2; i++)
+            try
             {
-                if (args[0] == _cmdsNames[i])
-                {
-                    return (_cmdsFunctions[i](handler, args));
-                }
+                var args = line.Split(' ');
+                var handlers =
+                    new Dictionary<string, Func<ClientEventHandler, string[],
+                        TurnResponse>>
+                    {
+                        {"Pass", HandlePassCmd},
+                        {"Draw", HandleDrawCmd},
+                        {"Play", HandlePlayCmd},
+                        {"Uno", HandleUnoCmd}
+                    };
+                return handlers[args[0]](handler, args);
+            }
+            catch
+            {
+                Console.WriteLine("[IGN] Unknowned command");
             }
             return null;
-        }
-
-        private static TurnResponse HandleUnoCmd(ClientEventHandler handler, string[] args)
-        {
-            if (args.Length != 1)
-            {
-                Console.WriteLine("431 ERR_NOARGUMENTSNEEDED");
-                return null;
-            }
-            if (handler.Event.Table.Status != GameStatus.Running)
-            {
-                Console.WriteLine("432 ERR_NOTGAMINGTIME");
-                return null;
-            }
-            if (handler.Event.Type != EventType.YourTurn)
-            {
-                Console.WriteLine("433 ERR_NOTYOURTURN");
-                return null;
-            }
-            if (handler.Event.Player.Hand.Cards.Count == 2)
-            {
-                Console.WriteLine("200 UNO_OK");
-                return new TurnResponse(null, true, TurnResponse.TurnType.Uno, CardColor.Undefined);
-                // TODO : Je pense qu'il faut que le joueur fasse un UNO AVANT de jouer sa carte
-            }
-            else
-            {
-                Console.WriteLine("434 ERR_INVALIDCARDSNB");
-                return null;
-            }
         }
 
         private CardColor GetInputCardColor(string color)
@@ -90,7 +64,7 @@ namespace Client
                 Console.WriteLine("423 ERR_INCOMPLETEARGUMENTS");
                 return null;      
             }
-            CardColor color = GetInputCardColor(args[2]);
+            var color = GetInputCardColor(args[2]);
             if (color == CardColor.Undefined)
             {
                 Console.WriteLine("425 ERR_UNDEFINEDCOLOR");
@@ -99,7 +73,7 @@ namespace Client
             else
             {
                 Console.WriteLine("200 PLAY_OK");
-                return new TurnResponse(handler.Event.Player.Hand.Cards[int.Parse(args[1])], false, TurnResponse.TurnType.Play, color);
+                return new TurnResponse(handler.Event.Player.Hand.Cards[int.Parse(args[1])], TurnResponse.TurnType.Play, color);
             }
         }
         
@@ -111,9 +85,11 @@ namespace Client
                 return null;      
             }
             Console.WriteLine("200 PLAY_OK");
-            return new TurnResponse(handler.Event.Player.Hand.Cards[int.Parse(args[1])], false, TurnResponse.TurnType.Play, CardColor.Undefined);
+            return new TurnResponse(handler.Event.Player.Hand.Cards[int.Parse(args[1])], TurnResponse.TurnType.Play, CardColor.Undefined);
             
         }
+        
+        
 
         private TurnResponse HandlePlayCmd(ClientEventHandler handler, string[] args)
         {
@@ -166,38 +142,32 @@ namespace Client
                 Console.WriteLine("453 ERR_NOTYOURTURN");
                 return null;
             }
-            if (!handler.Event.HasDraw)
-            {
-                Console.WriteLine("454 ERR_MUSTPLAYORDRAW");
-                return null;
-            }
             else
             {
                 Console.WriteLine("200 PASS_OK");
-                return new TurnResponse(null, false, TurnResponse.TurnType.Pass, CardColor.Undefined);
+                return new TurnResponse(null, TurnResponse.TurnType.Pass, CardColor.Undefined);
             }
         }
-
-        private TurnResponse HandleHandCmd(ClientEventHandler handler, string[] args)
+        
+        private static TurnResponse HandleUnoCmd(ClientEventHandler handler, string[] args)
         {
             if (args.Length != 1)
             {
-                Console.WriteLine("411 ERR_NOARGUMENTSNEEDED");
+                Console.WriteLine("451 ERR_NOARGUMENTSNEEDED");
+                return null;
             }
             if (handler.Event.Table.Status != GameStatus.Running)
             {
-                Console.WriteLine("412 ERR_NOTGAMINGTIME");
+                Console.WriteLine("452 ERR_NOTGAMINGTIME");
+                return null;
             }
-            if (handler.Event.Player.Hand.Cards.Count == 0)
+            if (handler.Event.Type != EventType.YourTurn)
             {
-                Console.WriteLine("413 ERR_EMPTYHAND");
+                Console.WriteLine("453 ERR_NOTYOURTURN");
+                return null;
             }
-            else
-            {
-                Console.WriteLine("200 HAND_OK:");
-                handler.Event.Player.Hand.DisplayHand(beautiful);
-            }
-            return null;
+            Console.WriteLine("200 UNO_OK");
+            return new TurnResponse(null, TurnResponse.TurnType.Uno, CardColor.Undefined);
         }
 
         private static TurnResponse HandleDrawCmd(ClientEventHandler handler, string[] args)
@@ -217,12 +187,8 @@ namespace Client
                 Console.WriteLine("463 ERR_NOTYOURTURN");
                 return null;
             }
-            if (handler.Event.HasDraw)
-            {
-                Console.WriteLine("464 ERR_ALREADYDRAW");
-                return null;
-            }
-            return new TurnResponse(null, false, TurnResponse.TurnType.Draw, CardColor.Undefined);
+            Console.WriteLine("200 DRAW_OK:");
+            return new TurnResponse(null, TurnResponse.TurnType.Draw, CardColor.Undefined);
         }
         
     }

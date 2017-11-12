@@ -25,13 +25,17 @@ namespace Common
             Cards.Remove(card);
         }
 
-        public bool CardIsValidToPut(Card cardToPut, Card cardTable)
+        public bool CardIsValidToBePut(Card cardToPut, Card cardTable)
         {
+            if (cardToPut.Color.Equals(CardColor.Undefined) &&
+                (cardToPut.Value.Equals(CardValue.Plus4) ||
+                 cardToPut.Value.Equals(CardValue.ChangeColor)))
+                return true;
             if (cardTable.Color == cardToPut.Color)
             {
                 return true;
             }
-            else if (cardTable.Value == cardToPut.Value)
+            if (cardTable.Value == cardToPut.Value)
             {
                 return true;
             }
@@ -43,18 +47,31 @@ namespace Common
             try
             {
                 var player = table.Players.Find(x => x.Hand == this);
-                if (!Cards.Contains(card))
+                if (!Cards.Exists(x => x.Value.Equals(card.Value) || x.Color.Equals(card.Color)))
+                {
+                    Console.Error.WriteLine("Ne contient pas la carte demandée");
+                    return (false);   
+                }
+                if (!CardIsValidToBePut(card, table.GetTopStackCard()))
+                {
+                    Console.Error.WriteLine("Invalid à la pose");
                     return (false);
-                if (!CardIsValidToPut(card, table.GetTopStackCard()))
-                    return (false);
-                card.HandleUse(player);
-                Cards.Remove(card);
-                table.AddCard(card);
+                }
+                var cardInHand = Cards.Find(x =>
+                    x.Value.Equals(card.Value) && x.Color.Equals(card.Color));
+                cardInHand.HandleUse(player, table);
+                if (cardInHand.Color == CardColor.Undefined)
+                {
+                    cardInHand.JokerColor = card.JokerColor;
+                }
+                Cards.Remove(cardInHand);
+                table.AddCard(cardInHand);
                 if (Cards.Count == 0)
                 {
                     table.SetGameEnd(player);
                 }
-                table.CurrentPlayer = table.GetNextPlayer();
+                table.TurnToNextPlayer();
+                table.NotifyTurnToAllPlayers();
             }
             catch (Exception)
             {
@@ -64,7 +81,7 @@ namespace Common
             return true;
         }
 
-        public void DisplayHand(CardBeautifuler beautifuler)
+        public void DisplayHand()
         {         
             var index = 0;
             foreach (var card in Cards)

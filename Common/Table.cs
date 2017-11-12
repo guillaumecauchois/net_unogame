@@ -18,9 +18,9 @@ namespace Common
     public class Table
     {
         [ProtoMember(1, IsRequired = true)] private StackCard  History;
-        [ProtoMember(2, IsRequired = true)] private StackCard  StackCard;
+        [ProtoMember(2, IsRequired = true)] public StackCard  StackCard;
         [ProtoMember(3)] public GameStatus                     Status;
-        [ProtoMember(4)] private Player                        Winner { get; set; }
+        [ProtoMember(4)] public Player                         Winner { get; set; }
         [ProtoMember(5)] public List<Player>                   Players;
         [ProtoMember(6)] public Player                         CurrentPlayer { set; get; }
 
@@ -53,7 +53,11 @@ namespace Common
 
         public Player GetNextPlayer()
         {
-            return Players.Find(x => x == CurrentPlayer);
+            var idx = Players.IndexOf(CurrentPlayer);
+            idx++;
+            if (idx >= Players.Count)
+                idx = 0;
+            return Players[idx];
         }
 
         public bool IsValidGame()
@@ -104,7 +108,7 @@ namespace Common
                 var serObj = SerializeHandler.SerializeObj(e);
                 foreach (var player in Players)
                 {
-                    player.Context.WriteAndFlushAsync(serObj);
+                    player.Context.WriteAndFlushAsync(serObj + "\r\n");
                 }
             }
             catch (Exception exception)
@@ -116,13 +120,23 @@ namespace Common
         
         public void SetGameEnd(Player winner)
         {
+            if (winner != null && !winner.HasUno)
+            {
+                var card = StackCard.PopRandomCard();
+                winner.Hand.AddCard(card);
+                card = StackCard.PopRandomCard();
+                winner.Hand.AddCard(card);
+                NotifyTurnToAllPlayers();
+                return;
+            }
+            Winner = winner;
             foreach (var player in Players)
             {
                 try
                 {
                     var eventEnd = new Event(EventType.EndGame, winner, this);
                     var serObj = SerializeHandler.SerializeObj(eventEnd);
-                    player.Context.WriteAndFlushAsync(serObj);
+                    player.Context.WriteAndFlushAsync(serObj + "\r\n");
                 }
                 catch (Exception e)
                 {
@@ -134,10 +148,48 @@ namespace Common
                 Console.WriteLine("[OK] End of the game the winner is : {0}!\n$> ", winner.Id);
             else
                 Console.WriteLine("[OK] End of the game, there is no winner\n$> ");
-            Winner = winner;
             Status = GameStatus.End;
         }
 
+        public void NotifyYourTurnToCurrentPlayer()
+        {
+            /* Notify current player that is now his turn */
+            var e = new Event(EventType.YourTurn, CurrentPlayer, this);
+            var serObj = SerializeHandler.SerializeObj(e);
+            CurrentPlayer.Context.WriteAndFlushAsync(serObj + "\r\n");
+        }
+        
+        public void NotifyTurnToAllPlayers()
+        {
+            /* Notify current player that is now his turn */
+            NotifyYourTurnToCurrentPlayer();
+                
+            /* Notify other players that is turn of "current_player" */
+            var e = new Event(EventType.PlayerTurn, CurrentPlayer, this);
+            SendObjectToOtherPlayers(e, CurrentPlayer);
+        }
+
+        public void NotifyHasPlayerHasPlayed(Player player)
+        {
+            var e = new Event(EventType.PlayerHasPlayed, player, this);
+            var serObj = SerializeHandler.SerializeObj(e);
+            
+            // Cannot use SendObjectToOtherPlayers() because use CurrentPlayer
+            // but it's changed
+            foreach (var uplayer in Players)
+            {
+                if (uplayer != player)
+                {
+                    uplayer.Context.WriteAndFlushAsync(serObj);
+                }
+            }
+        }
+        
+        public void TurnToNextPlayer()
+        {
+            CurrentPlayer = GetNextPlayer();
+        }
+        
         public void ResetGamePlay()
         {
             History.Clear();

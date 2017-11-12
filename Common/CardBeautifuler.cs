@@ -9,14 +9,7 @@ namespace Common
         {
             string colorString;
             string valueString;
-            
-            //var Colors = new [] {"Undefined", "Green", "Red", "Yellow", "Blue"};
-            /*var Types = new[]
-            {
-                "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven",
-                "Eight", "Nine", "Plus_2", "Revert",
-                "PassTurn", "ChangeColor", "Plus4"
-            };*/
+            string jokerColorString;
 
             var colors = new List<KeyValuePair<CardColor, string>>
             {
@@ -45,20 +38,19 @@ namespace Common
                 new KeyValuePair<CardValue, string>(CardValue.Plus2, "Plus 2"),
                 new KeyValuePair<CardValue, string>(CardValue.Plus4, "Plus 4"),
                 new KeyValuePair<CardValue, string>(CardValue.Revert, "Revert"),
-                new KeyValuePair<CardValue, string>(CardValue.Undefined, "Undefined")
             };
 
             try
             {
                 colorString = colors.Find(x => x.Key == card.Color).Value;
+                jokerColorString = colors.Find(x => x.Key == card.JokerColor).Value;
                 valueString = values.Find(x => x.Key == card.Value).Value;
             }
             catch (Exception e)
             {
                 throw new Exception("Impossible de traduire la carte");
-            }
-
-            return $"{colorString} {valueString}";
+            }            
+            return $"{colorString} {valueString} {jokerColorString}";
         }
     }
 }

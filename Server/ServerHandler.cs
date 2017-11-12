@@ -21,6 +21,7 @@ namespace Server
             try
             {
                 _gameCore.Table.AddPlayer(p);
+                Console.Write("\n[{0}] Join the game\n$> ", p.Id);
             }
             catch (Exception e)
             {

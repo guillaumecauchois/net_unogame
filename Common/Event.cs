@@ -20,7 +20,6 @@ namespace Common
             Player = null;
             Table = null;
             ErrorMsg = null;
-            HasDraw = false;
             Type = EventType.Error;
         }
         
@@ -35,7 +34,6 @@ namespace Common
             Type = type;
             Player = player;
             Table = table;
-            HasDraw = false;
             ErrorMsg = null;
         }
         
@@ -46,9 +44,6 @@ namespace Common
         [ProtoMember(3)]
         public string ErrorMsg { get; set; }
         [ProtoMember(4)]
-        public Table Table { get; set; }
-        [ProtoMember(5)]
-        public bool HasDraw { get; set; }
-        
+        public Table Table { get; set; }        
     }
 }

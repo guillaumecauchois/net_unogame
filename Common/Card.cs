@@ -42,27 +42,52 @@ namespace Common
     public class Card
     {
         /* Attributs */
-        [ProtoMember(1)]
-        public CardColor Color { get; set; }
-        [ProtoMember(2)]
-        public CardValue Value { get; set; }
+        [ProtoMember(1)] public CardColor Color { get; set; }
+        [ProtoMember(2)] public CardValue Value { get; set; }
+        [ProtoMember(3)] public CardColor JokerColor { get; set; }
 
         public Card()
         {
             Color = CardColor.Undefined;
             Value = CardValue.Undefined;
+            JokerColor = CardColor.Undefined;
         }
-        
+
+
         public Card(CardColor color, CardValue value)
         {
             Color = color;
             Value = value;
+            JokerColor = CardColor.Undefined;
         }
-
-        public virtual void HandleUse(Player player)
+        
+        public void HandleUse(Player player, Table table)
         {
             Console.WriteLine("[OK] Player {0} put on table a {1} card",
                 player.Id, CardBeautifuler.GetStringCard(this));
+
+            switch (Value)
+            {
+                case CardValue.ChangeColor:
+                    break;
+                case CardValue.PassTurn:
+                    table.TurnToNextPlayer();
+                    break;
+                case CardValue.Revert:
+                    table.Players.Reverse();
+                    break;
+                case CardValue.Plus2:
+                case CardValue.Plus4:
+                    var nb = (Value == CardValue.Plus2) ? 2 : 4;
+                    var next = table.GetNextPlayer();
+                    for (var i = 0; i != nb; ++i)
+                    {
+                        var card = table.StackCard.PopRandomCard();
+                        next.Hand.AddCard(card);
+                    }
+                    player.HasUno = false;
+                    break;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using DotNetty.Transport.Channels;
 using ProtoBuf;
 
@@ -10,19 +11,21 @@ namespace Common
         public Player()
         {
             Id = _idGenerator;
+            _idGenerator++;
             Hand = new Hand();
             Context = null;
-            _idGenerator++;
-            Console.Write("\n[{0}] Join the game\n$> ", Id);
+            HasDraw = false;
+            HasUno = false;
         }
         
         public Player(IChannelHandlerContext context)
         {
             Id = _idGenerator;
+            _idGenerator++;
             Hand = new Hand();
             Context = context;
-            _idGenerator++;
-            Console.Write("\n[{0}] Join the game\n$> ", Id);
+            HasDraw = false;
+            HasUno = false;
         }
 
         /* Serialized Prop */
@@ -32,13 +35,26 @@ namespace Common
         public int Id { get; set; }
         [ProtoMember(3)]
         public Hand Hand { get; set; }
+        [ProtoMember(4)]
+        public bool HasDraw { get; set; }
+        [ProtoMember(5)]
+        public bool HasUno { get; set; }
+        
         
         /* Non-Serialize Prop */
         public IChannelHandlerContext Context { get; set; }
 
         public override string ToString()
         {
-            return $"{Id}\t *HandSize = {Hand.Cards.Count} ";
+            return $"{Id}\t HandSize = {Hand.Cards.Count} HasDraw = {HasDraw} HasUno = {HasUno}";
+        }
+        
+        public bool SendError(string msg, Table table = null)
+        {
+            var e = new Event(EventType.Error, this, table) {ErrorMsg = msg};
+            var serObj = SerializeHandler.SerializeObj(e);
+            Context.WriteAndFlushAsync(serObj + "\r\n");
+            return (true);
         }
     }
 }

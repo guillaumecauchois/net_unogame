@@ -7,82 +7,85 @@ namespace Client
 {
     public class ClientEventHandler
     {
-        private delegate void ClientEventHandlerCmd();
-        private ClientEventHandlerCmd[] _events;
-        private CardBeautifuler _beautifuler;
         public Event Event { get; set; }
-
-        public ClientEventHandler()
+        
+        public ClientEventHandler(Event e)
         {
-            Event = null;
-            _beautifuler = new CardBeautifuler();
-            var _events = new Dictionary<EventType, ClientEventHandlerCmd>
+            Event = e;
+        }
+        
+        public ClientEventHandler() {}
+
+        public void HandleEvent(Event eventReceived)
+        {
+            Event = eventReceived;
+            var events = new Dictionary<EventType, Func<Event, bool>>
             {
                 {EventType.YourTurn, HandleEventYourTurn},
                 {EventType.PlayerTurn, HandleEventPlayerTurn},
                 {EventType.EndGame, HandleEventEndGame},
                 {EventType.PlayerHasPlayed, HandleEventPlayerHasPlayed},
-                {EventType.Error, HandleEventInvalidCommand}
+                {EventType.Error, HandleEventInvalidCommand},
+                {EventType.StartGame, HandleEventStartGame}
             };
-        }
-        
-
-        public void HandleEvent(Event eventReceived)
-        {
-            Event = eventReceived;
-            if (Event.Type == EventType.YourTurn)
+            try
             {
-                HandleEventYourTurn();
-            }
-            else if (Event.Type == EventType.PlayerTurn)
-            {
-                HandleEventPlayerTurn();
-            }
-            else if (Event.Type == EventType.PlayerHasPlayed)
-            {
-                HandleEventPlayerHasPlayed();
-            }
-            else if (Event.Type == EventType.EndGame)
-            {
-                HandleEventEndGame();
-            }
-            /*try
-            {
-                _events[(int)Event.Type].Invoke();
+                events[eventReceived.Type].Invoke(eventReceived);
             }
             catch (Exception e)
             {
-                Console.Error.Write("[ERR] Receive invalid Event Type : " + Event.Type);
-            }*/
+                Console.Error.Write("[ERR] Receive invalid Event Type : " + eventReceived.Type);
+            }
         }
 
-        private void HandleEventInvalidCommand()
+        private static bool HandleEventStartGame(Event eventReceived)
         {
-            Console.WriteLine("handle event invalid command");
+            Console.WriteLine("[OK] New Game starting !");
+            return (true);
         }
 
-        private void HandleEventYourTurn()
+        private static bool HandleEventInvalidCommand(Event eventReceived)
+        {
+            Console.WriteLine($"[ERR] An error occured, server say \"{eventReceived.ErrorMsg}\"");
+            return true;
+        }
+
+        private static bool HandleEventYourTurn(Event eventReceived)
         {
             Console.WriteLine("It's your turn to play !");
-            // TODO : Si il a fait un "UNO", on lui réaffiche sa main ?
-            Console.WriteLine("La carte posé sur la table est : " + CardBeautifuler.GetStringCard(Event.Table.GetTopStackCard()));
-            Event.Player.Hand.DisplayHand(_beautifuler);
+            Console.WriteLine("The card on table is : " +
+                          CardBeautifuler.GetStringCard(eventReceived.Table.GetTopStackCard()));
+            eventReceived.Player.Hand.DisplayHand();
+            Console.WriteLine("");
+            Console.Write("$> ");
+            return true;
         }
 
-        private void HandleEventEndGame()
+        private static bool HandleEventEndGame(Event eventReceived)
         {
-            // TODO : Ne pas oublier de set le winner à la fin de la partie
-            //Console.WriteLine("End of the game ! Winner is player#" + Event.Table.Winner);
+            if (eventReceived.Table.Winner != null)
+                Console.WriteLine("End of the game ! Winner is player#" + eventReceived.Table.Winner);
+            else
+                Console.WriteLine("End of the game ! Lot of people win the game...");
+            return true;
         }
 
-        private void HandleEventPlayerTurn()
+        private static bool HandleEventPlayerTurn(Event eventReceived)
         {
-            Console.WriteLine("It's turn of player#" + Event.Player.Id);
+            Console.WriteLine("It's turn of player #" + eventReceived.Player.Id);
+            return true;
         }
 
-        private void HandleEventPlayerHasPlayed()
+        private static bool HandleEventPlayerHasPlayed(Event eventReceived)
         {
-            Console.WriteLine("Player #" + Event.Player.Id + " played " + CardBeautifuler.GetStringCard(Event.Table.GetTopStackCard()));
+            Console.WriteLine("Player #" + eventReceived.Player.Id + " played " + CardBeautifuler.GetStringCard(eventReceived.Table.GetTopStackCard()));
+            return true;
+        }
+
+        private static bool HandleEventError(Event eventReceived)
+        {
+            Console.WriteLine($"The server return an error : {eventReceived.ErrorMsg}");
+            return true;
         }
     }
 }

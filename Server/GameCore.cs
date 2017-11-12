@@ -61,36 +61,43 @@ namespace Server
             Table.StartGame();
             var currentPlayer = Table.CurrentPlayer;
             
-            /* Notify current player that is now his turn */
-            var e = new Event(EventType.YourTurn, currentPlayer, Table);
-            var serObj = SerializeHandler.SerializeObj(e);
-            /* var eClone = SerializeHandler.DeserializeObject<Event>(serObj);
-            var cb = new CardBeautifuler();
-            eClone.Player.Hand.DisplayHand(cb); */
-            currentPlayer.Context.WriteAndFlushAsync(serObj + "\r\n");
-                
-            /* Notify other players that is turn of "current_player" */
-            e = new Event(EventType.PlayerTurn, currentPlayer, Table);
-            Table.SendObjectToOtherPlayers(e, currentPlayer);
+            Table.NotifyTurnToAllPlayers();
         }
 
         public void HandleTurnResponse(IChannelHandlerContext context, string msg)
         {
-            Console.WriteLine($"{msg}");
             try
             {
                 var tResponse =
-                    SerializeHandler.DeserializeObject<TurnResponse>(msg); 
-                
+                    SerializeHandler.DeserializeObject<TurnResponse>(msg);
+
                 var currentPlayer = Table.GetPlayerByContext(context);
-                if (TurnResponseHandler.Handle(tResponse, currentPlayer, Table) == -1)
+                if (!TurnResponseHandler.Handle(tResponse, currentPlayer,
+                        Table))
                 {
-                    Console.Error.WriteLine("[ERR] Receive information from unknowned player");
+                    Console.WriteLine("[KO] Player play an invalid card, we will inform him");
+                    if (currentPlayer == Table.CurrentPlayer)
+                    {
+                        Console.WriteLine("[OK] Ask to player a new turn");
+                    }
                 }
             }
             catch (SerializeHandlerException)
             {
-                Console.Error.WriteLine("[ERR] Receive invalid information from a client");
+                var e = new Event(EventType.Error, null,
+                    Table) {ErrorMsg = "The card choose is unvalid"};
+                var serObj = SerializeHandler.SerializeObj(e);
+                context.WriteAndFlushAsync(serObj + "\r\n");
+            }
+            catch (Exception)
+            {
+                var e = new Event(EventType.Error, null,
+                    Table)
+                {
+                    ErrorMsg = "The game conditions don't permit you to game now, wait to be invited."
+                };
+                var serObj = SerializeHandler.SerializeObj(e);
+                context.WriteAndFlushAsync(serObj + "\r\n");
             }
         }
     }

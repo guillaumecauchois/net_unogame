@@ -18,7 +18,7 @@ namespace Client
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e);
+                Console.Error.WriteLine(e.Message);
             }
         }
 

@@ -52,12 +52,16 @@ namespace Common
 
         public void GenerateDeck()
         {
-            for (var color = CardColor.MinDefinedColor; color <= CardColor.MaxDefinedColor; color++)
+            for (var color = CardColor.MinDefinedColor;
+                color <= CardColor.MaxDefinedColor;
+                color++)
             {
                 AddCard(new Card(color, CardValue.Zero));
-                for (var value = CardValue.One; value < CardValue.ChangeColor; value++)
+                for (var value = CardValue.One;
+                    value < CardValue.ChangeColor;
+                    value++)
                 {
-                    AddCard((new Card(color, value)));  
+                    AddCard(new Card(color, value));
                     AddCard(new Card(color, value));
                 }
             }
