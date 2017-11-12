@@ -10,8 +10,7 @@ namespace Common
     {
         public Player()
         {
-            Id = _idGenerator;
-            _idGenerator++;
+            Id = 0;
             Hand = new Hand();
             Context = null;
             HasDraw = false;
@@ -40,11 +39,15 @@ namespace Common
         [ProtoMember(5)]
         public bool HasUno { get; set; }
         
-        
         /* Non-Serialize Prop */
         public IChannelHandlerContext Context { get; set; }
 
         public override string ToString()
+        {
+            return $"{Id}";
+        }
+        
+        public string ToStringDetails()
         {
             return $"{Id}\t HandSize = {Hand.Cards.Count} HasDraw = {HasDraw} HasUno = {HasUno}";
         }

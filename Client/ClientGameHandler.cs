@@ -190,6 +190,5 @@ namespace Client
             Console.WriteLine("200 DRAW_OK:");
             return new TurnResponse(null, TurnResponse.TurnType.Draw);
         }
-        
     }
 }
