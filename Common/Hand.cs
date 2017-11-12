@@ -25,7 +25,7 @@ namespace Common
             Cards.Remove(card);
         }
 
-        public bool CardIsValidToBePut(Card cardToPut, Card cardTable)
+        private static bool CardIsValidToBePut(Card cardToPut, Card cardTable)
         {
             if (cardToPut.Color.Equals(CardColor.Undefined) &&
                 (cardToPut.Value.Equals(CardValue.Plus4) ||
@@ -62,8 +62,11 @@ namespace Common
                 {
                     table.SetGameEnd(player);
                 }
-                table.TurnToNextPlayer();
-                table.NotifyTurnToAllPlayers();
+                else
+                {
+                    table.TurnToNextPlayer();
+                    table.NotifyTurnToAllPlayers();   
+                }
             }
             catch (Exception)
             {

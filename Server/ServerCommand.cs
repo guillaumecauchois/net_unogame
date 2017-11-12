@@ -39,8 +39,11 @@ namespace Server
                 core.LaunchNewGame();
                 Console.WriteLine("[OK] Game started");
             }
+            else if (table.Status.Equals(GameStatus.Running))
+                Console.Error.WriteLine(
+                    "[ERR] Sorry, the game is still running");
             else
-                Console.Error.WriteLine("[ERR] Sorry, the game is still running");
+                Console.Error.WriteLine("[OK] Game over, please reset the gameplay for init new game");
             return 0;
         }
 
@@ -66,7 +69,7 @@ namespace Server
             }
             foreach (var player in listPlayers)
             {
-                Console.WriteLine("{0}", player);
+                Console.WriteLine("{0}", player.ToStringDetails());
             }
             return (0);
         }
