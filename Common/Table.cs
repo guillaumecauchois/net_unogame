@@ -64,6 +64,18 @@ namespace Common
         {
             return (Players.Count >= 2);
         }
+
+        public void checkStackCardValidity()
+        {
+            if (StackCard.Count() >= 5) return;
+            var histSize = History._stack.Count;
+            var save = History._stack.GetRange(0, histSize - 5);
+            foreach (var card in save)
+            {
+                StackCard.AddCard(card);
+            }
+            History._stack.RemoveRange(0, histSize - 5);
+        }
         
         public void RemovePlayer(Player player)
         {

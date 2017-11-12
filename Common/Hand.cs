@@ -39,7 +39,8 @@ namespace Common
         }
         
         public bool PutCardOnTable(Table table, Card card)
-        {   
+        {
+            table.checkStackCardValidity();
             try
             {
                 var player = table.Players.Find(x => x.Hand == this);
