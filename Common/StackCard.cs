@@ -7,18 +7,14 @@ namespace Common
     [ProtoContract]
     public class StackCard
     {
-        [ProtoMember(1)] public List<Card> _stack;
+        [ProtoMember(1)]
+        private List<Card> _stack;
 
         public StackCard()
         {
             _stack = new List<Card>();
         }
 
-        public int Count()
-        {
-            return _stack.Count;
-        }
-        
         public void AddCard(Card card)
         {
             _stack.Add(card);
@@ -28,6 +24,11 @@ namespace Common
         {
             // Get Stack Lenght
             var lenght = _stack.Count;
+            if (lenght == 0)
+            {
+                // TODO: Guillaume - Passer les vieilles cartes de _history dans _stackCard
+            }
+
             // Generate the index of the random card
             var random = new Random();
             var idxRandom = Randomizer.GetRandomNumber(0, lenght);
