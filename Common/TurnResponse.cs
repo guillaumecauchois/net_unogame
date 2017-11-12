@@ -18,6 +18,14 @@ namespace Common
         [ProtoMember(3)] public TurnType Type { get; set; }
         [ProtoMember(4)] public CardColor JokerColor { get; set; }
 
+        public TurnResponse()
+        {
+            Card = null;
+            Uno = false;
+            Type = TurnType.Play;
+            JokerColor = CardColor.Undefined;
+        }
+        
         public TurnResponse(Card card, bool uno, TurnType type, CardColor color)
         {
             Card = card;

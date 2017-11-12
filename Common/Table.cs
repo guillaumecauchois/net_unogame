@@ -98,6 +98,20 @@ namespace Common
             History.AddCard(StackCard.PopRandomCard());
             Status = GameStatus.Running;
             CurrentPlayer = Players.First();
+            try
+            {
+                var e = new Event(EventType.StartGame, CurrentPlayer, this);
+                var serObj = SerializeHandler.SerializeObj(e);
+                foreach (var player in Players)
+                {
+                    player.Context.WriteAndFlushAsync(serObj);
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine(exception);
+                throw;
+            }
         }
         
         public void SetGameEnd(Player winner)

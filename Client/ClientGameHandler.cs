@@ -19,7 +19,7 @@ namespace Client
             _cmdsFunctions[2] = HandleUnoCmd;
             _cmdsFunctions[3] = HandlePassCmd;
             _cmdsFunctions[4] = HandleHandCmd;
-            _cmdsNames = new[] {"Play", "Draw", "Uno", "Pass"};
+            _cmdsNames = new[] {"Play", "Draw", "Uno", "Pass", "Hand"};
             beautiful = new CardBeautifuler();
         }
 
