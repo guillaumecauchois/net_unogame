@@ -1,25 +1,29 @@
-﻿using System;
+﻿using System.Runtime.Remoting.Contexts;
+using Common;
+using SecureChat.Client;
 
-namespace SecureChat.Client
+namespace Client
 {
     using System;
-    using System.IO;
     using System.Net;
-    using System.Net.Security;
-    using System.Security.Cryptography.X509Certificates;
     using System.Threading.Tasks;
     using DotNetty.Codecs;
     using DotNetty.Transport.Bootstrapping;
     using DotNetty.Transport.Channels;
     using DotNetty.Transport.Channels.Sockets;
+    
+    
     class Program
     {
-        static async Task RunClientAsync()
+        
+        public static ClientGameHandler GameHandler = new ClientGameHandler();
+        public static ClientHandler handler = new ClientHandler();
+        
+        static async Task RunClientAsync(string ip, int port)
         {
   
             var group = new MultithreadEventLoopGroup();
 
-            X509Certificate2 cert = null;
             string targetHost = null;
   
             try
@@ -34,14 +38,15 @@ namespace SecureChat.Client
                         IChannelPipeline pipeline = channel.Pipeline;
 
                         pipeline.AddLast(new DelimiterBasedFrameDecoder(8192, Delimiters.LineDelimiter()));
-                        pipeline.AddLast(new StringEncoder(), new StringDecoder(), new SecureChatClientHandler());
+                        pipeline.AddLast(new StringEncoder(), new StringDecoder(), handler);
                     }));
 
-                IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(ClientSettings.Host, ClientSettings.Port));
+                IChannel bootstrapChannel = await bootstrap.ConnectAsync(new IPEndPoint(IPAddress.Parse(ip), port));
 
                 for (;;)
                 {
-                    string line = Console.ReadLine();
+                    Console.Write("$> ");
+                    var line = Console.ReadLine();
                     if (string.IsNullOrEmpty(line))
                     {
                         continue;
@@ -49,10 +54,16 @@ namespace SecureChat.Client
 
                     try
                     {
-                        await bootstrapChannel.WriteAndFlushAsync(line + "\r\n");
+                        var response = GameHandler.HandleClientCmd(handler.GetEventHandler(), line);
+                        if (response != null)
+                        {   
+                            var serObj = SerializeHandler.SerializeObj(response);
+                            await bootstrapChannel.WriteAndFlushAsync(serObj + "\r\n");
+                        }
                     }
-                    catch
+                    catch (Exception e)
                     {
+                        Console.Error.WriteLine(e.Message);
                     }
                     if (string.Equals(line, "bye", StringComparison.OrdinalIgnoreCase))
                     {
@@ -69,6 +80,37 @@ namespace SecureChat.Client
             }
         }
 
-        static void Main() => RunClientAsync().Wait();
+        static int Main(string[] args)
+        {
+            int port;
+            string ip;
+
+            if (args.Length != 2)
+            {
+                Console.Error.WriteLine("ERROR: You need provide a port for the connection.");
+                return (1);
+            }
+            try
+            {
+                port = int.Parse(args[1]);
+                ip = args[0];
+            }
+            catch (FormatException)
+            {
+                Console.Error.WriteLine("ERROR: Invalid port provided.");
+                return (1);
+            }
+            Console.WriteLine("|******| UNO - SERVER - C# .NET Project |*****|");
+            Console.WriteLine("Contributors: Guillaume CAUCHOIS & Pierre STASZAK");
+            try
+            {
+                RunClientAsync(ip, port).Wait();
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e.Message);
+            }
+            return (0);
+        }
     }
 }

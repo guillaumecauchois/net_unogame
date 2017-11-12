@@ -1,61 +1,57 @@
-﻿namespace cardGames.Server
+﻿using Common;
+
+namespace Server
 {
     using System;
-    using System.Net;
     using DotNetty.Transport.Channels;
-    using DotNetty.Transport.Channels.Groups;
-
+    
     public class ServerHandler : SimpleChannelInboundHandler<string>
     {
-        static volatile IChannelGroup group;
-        
-        /**
-         * Handle the connection
-         */
-        public override void ChannelActive(IChannelHandlerContext contex)
-        {
-            IChannelGroup g = group;
-            
-            if (g == null)
-            {
-                lock (this)
-                {
-                    if (group == null)
-                    {
-                        g = group = new DefaultChannelGroup(contex.Executor);
-                    }
-                }
-            }
+        private GameCore                _gameCore;
 
-            contex.WriteAndFlushAsync(string.Format("Welcome to UNO server!\n", Dns.GetHostName()));
-            g.Add(contex.Channel);
+        public ServerHandler(GameCore gameCore)
+        {
+            _gameCore = gameCore;
         }
 
-        class EveryOneBut : IChannelMatcher
+        public override void HandlerAdded(IChannelHandlerContext context)
         {
-            readonly IChannelId id;
-
-            public EveryOneBut(IChannelId id)
+            base.HandlerAdded(context);
+            var p = new Player(context);
+            try
             {
-                this.id = id;
+                _gameCore.Table.AddPlayer(p);
+                Console.Write("\n[{0}] Join the game\n$> ", p.Id);
             }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
 
-            public bool Matches(IChannel channel) => !channel.Id.Equals(this.id);
+        public override void HandlerRemoved(IChannelHandlerContext context)
+        {
+            try
+            {
+                var playerHasGone = _gameCore.Table.GetPlayerByContext(context);
+                _gameCore.Table.RemovePlayer(playerHasGone);
+            }
+            catch (Exception e)
+            {
+                Console.Error.Write("[ERR] {0}\n$>", e.Message);
+            }
         }
 
         protected override void ChannelRead0(IChannelHandlerContext contex, string msg)
         {
-            string broadcast    = string.Format("[{0}] {1}\n", contex.Channel.RemoteAddress, msg);
-            string response     = string.Format("[you] {0}\n", msg);
-            group.WriteAndFlushAsync(broadcast, new EveryOneBut(contex.Channel.Id));
-            contex.WriteAndFlushAsync(response);
+            _gameCore.HandleTurnResponse(contex, msg);
         }
 
         public override void ChannelReadComplete(IChannelHandlerContext ctx) => ctx.Flush();
 
         public override void ExceptionCaught(IChannelHandlerContext ctx, Exception e)
         {
-            Console.Error.WriteLine("{0}", e.StackTrace);
+            // Console.Error.WriteLine(e.StackTrace);
             ctx.CloseAsync();
         }
 
