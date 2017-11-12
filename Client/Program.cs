@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using System.Runtime.Remoting.Contexts;
+using Common;
 using SecureChat.Client;
 
 namespace Client
@@ -53,7 +54,12 @@ namespace Client
 
                     try
                     {
-                        GameHandler.HandleClientCmd(saucisse.GetEventHandler(), line);
+                        TurnResponse response = GameHandler.HandleClientCmd(saucisse.GetEventHandler(), line);
+                        if (response != null)
+                        {
+                            var serObj = SerializeHandler.SerializeObj(response);
+                            await bootstrapChannel.WriteAndFlushAsync(serObj + "\r\n");
+                        }
                         //Console.WriteLine(line);
                         //await bootstrapChannel.WriteAndFlushAsync(line + "\r\n");
                     }
